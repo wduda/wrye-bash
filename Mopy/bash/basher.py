@@ -12436,6 +12436,7 @@ class Mod_BaloGroups_Edit(wx.Dialog):
         if lower == upper:
             return group
         else:
+            # noinspection PyStringFormat,PyStringFormat
             return u'%s  %d : %d' % (group,lower,upper)
 
     def Refresh(self,index):
@@ -13838,6 +13839,7 @@ class Mod_EditorIds_Import(Link):
                 buff.close()
                 balt.showLog(self.window,text,_(u'Objects Changed'),icons=bashBlue)
         except bolt.BoltError as e:
+            # noinspection PyStringFormat
             balt.showWarning(self.window,'%'%e)
 
 #------------------------------------------------------------------------------
@@ -16229,6 +16231,7 @@ class Save_RepairFactions(Link):
                     if recId == 7:
                         playerStartSpell = saveFile.getIref(0x00000136)
                         if npc.spells != None and playerStartSpell not in npc.spells:
+                            # noinspection PyStringFormat
                             log(u'. %08X %s -- **%s**' % (recId,eid._(u'DefaultPlayerSpell')))
                             npc.spells.append(playerStartSpell)
                             refactioned = True #--I'm lying, but... close enough.
