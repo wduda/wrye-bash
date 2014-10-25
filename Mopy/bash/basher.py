@@ -1137,7 +1137,7 @@ class List(wx.Panel):
             if mouseItem != self.mouseItem:
                 self.mouseItem = mouseItem
                 self.MouseEnteredItem(mouseItem)
-        elif event.Leaving() and self.mouseItem != None:
+        elif event.Leaving() and self.mouseItem is not None:
             self.mouseItem = None
             self.MouseEnteredItem(None)
         event.Skip()
@@ -4742,7 +4742,7 @@ class MessageList(List):
 
     def GetItems(self):
         """Set and return self.items."""
-        if self.searchResults != None:
+        if self.searchResults is not None:
             self.items = list(self.searchResults)
         else:
             self.items = self.data.keys()
@@ -4871,7 +4871,7 @@ class MessagePanel(SashPanel):
 
     def SetStatusCount(self):
         """Sets status bar count field."""
-        if gMessageList.searchResults != None:
+        if gMessageList.searchResults is not None:
             numUsed = len(gMessageList.searchResults)
         else:
             numUsed = len(gMessageList.items)
@@ -6209,7 +6209,7 @@ class DocBrowser(wx.Frame):
         try:
             with docPath.open('r',encoding='utf-8-sig') as textFile:
                 maText = re.match(ur'^=.+=#\s*$',textFile.readline(),re.U)
-            return (maText != None)
+            return (maText is not None)
         except UnicodeDecodeError:
             return False
 
@@ -6939,7 +6939,7 @@ class PatchDialog(wx.Dialog):
         """Show patcher panel."""
         gConfigSizer = self.gConfigSizer
         if patcher == self.currentPatcher: return
-        if self.currentPatcher != None:
+        if self.currentPatcher is not None:
             gConfigSizer.Show(self.currentPatcher.gConfigPanel,False)
         gConfigPanel = patcher.GetConfigPanel(self,gConfigSizer,self.gTipText)
         gConfigSizer.Show(gConfigPanel,True)
@@ -7911,21 +7911,21 @@ class TweakPatcher(Patcher):
                          + u'\n' + tweak.key[i])
                 new = balt.askNumber(self.gConfigPanel,label,prompt=_(u'Value'),
                     title=tweak.label+_(u' ~ Custom Tweak Value'),value=self.tweaks[tweakIndex].choiceValues[index][i],min=-10000,max=10000)
-                if new == None: #user hit cancel
+                if new is None: #user hit cancel
                     return
                 value.append(float(new)/10)
             elif isinstance(v,int):
                 label = _(u'Enter the desired custom tweak value.')+u'\n'+tweak.key[i]
                 new = balt.askNumber(self.gConfigPanel,label,prompt=_(u'Value'),
                     title=tweak.label+_(u' ~ Custom Tweak Value'),value=self.tweaks[tweakIndex].choiceValues[index][i],min=-10000,max=10000)
-                if new == None: #user hit cancel
+                if new is None: #user hit cancel
                     return
                 value.append(new)
             elif isinstance(v,basestring):
                 label = _(u'Enter the desired custom tweak text.')+u'\n'+tweak.key[i]
                 new = balt.askText(self.gConfigPanel,label,
                     title=tweak.label+_(u' ~ Custom Tweak Text'),default=self.tweaks[tweakIndex].choiceValues[index][i])
-                if new == None: #user hit cancel
+                if new is None: #user hit cancel
                     return
                 value.append(new)
         if not value: value = tweak.choiceValues[index]
@@ -8019,12 +8019,12 @@ class DoublePatcher(TweakPatcher,ListPatcher):
 # dictionaries in bash.patcher.__init__.py (see the game specific creation
 # below)
 #------------------------------------------------------------------------------
-# Patchers 10 ------------------------------------------------------------------
+# Patchers 10 -----------------------------------------------------------------
 class PatchMerger(PatchMerger,ListPatcher):
     listLabel = _(u'Mergeable Mods')
 class CBash_PatchMerger(CBash_PatchMerger,ListPatcher):
     listLabel = _(u'Mergeable Mods')
-# Patchers 20 ------------------------------------------------------------------
+# Patchers 20 -----------------------------------------------------------------
 class GraphicsPatcher(GraphicsPatcher,ListPatcher): pass
 class CBash_GraphicsPatcher(CBash_GraphicsPatcher,ListPatcher): pass
 
@@ -8081,7 +8081,7 @@ class CBash_ImportScripts(CBash_ImportScripts,ListPatcher):pass
 class SpellsPatcher(SpellsPatcher,ListPatcher):pass
 class CBash_SpellsPatcher(CBash_SpellsPatcher,ListPatcher):pass
 
-# Patchers 30 ------------------------------------------------------------------
+# Patchers 30 -----------------------------------------------------------------
 class AssortedTweaker(AssortedTweaker,TweakPatcher): pass
 class CBash_AssortedTweaker(CBash_AssortedTweaker,TweakPatcher): pass
 
@@ -8097,7 +8097,7 @@ class CBash_NamesTweaker(CBash_NamesTweaker,TweakPatcher): pass
 class TweakActors(TweakActors,TweakPatcher): pass
 class CBash_TweakActors(CBash_TweakActors,TweakPatcher): pass
 
-# Patchers 40 ------------------------------------------------------------------
+# Patchers 40 -----------------------------------------------------------------
 class UpdateReferences(UpdateReferences,ListPatcher): pass
 class CBash_UpdateReferences(CBash_UpdateReferences,ListPatcher): pass
 
@@ -8227,7 +8227,6 @@ class BoolLink(Link):
 
     def Execute(self,event):
         settings[self.key] ^= True
-
 
 #------------------------------------------------------------------------------
 class Files_Open(Link):
@@ -10347,9 +10346,9 @@ class Installer_Espm_List(InstallerLink):
             wx.TheClipboard.Close()
         balt.showLog(self.window,subs,_(u'Esp/m List'),asDialog=False,fixedFont=False,icons=bashBlue)
 
-# InstallerDetails Subpackage Links --------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
+# InstallerDetails Subpackage Links -------------------------------------------
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 class Installer_Subs_SelectAll(InstallerLink):
     """Select All sub-packages in installer for installation."""
     def AppendToMenu(self,menu,window,data):
@@ -11168,7 +11167,7 @@ class INI_SortValid(BoolLink):
         BoolLink.Execute(self,event)
         iniList.RefreshUI()
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 class INI_AllowNewLines(BoolLink):
     """Consider INI Tweaks with new lines valid."""
     def __init__(self): BoolLink.__init__(self,
@@ -11181,7 +11180,7 @@ class INI_AllowNewLines(BoolLink):
         BoolLink.Execute(self,event)
         iniList.RefreshUI()
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 class INI_ListINIs(Link):
     """List errors that make an INI Tweak invalid."""
     def AppendToMenu(self,menu,window,data):
@@ -11198,7 +11197,7 @@ class INI_ListINIs(Link):
             wx.TheClipboard.Close()
         balt.showLog(self.window,text,_(u'Active INIs'),asDialog=False,fixedFont=False,icons=bashBlue)
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 class INI_ListErrors(Link):
     """List errors that make an INI Tweak invalid."""
     def AppendToMenu(self,menu,window,data):
@@ -11286,7 +11285,7 @@ class INI_Delete(Link):
             self.window.RefreshUI()
         dialog.Destroy()
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 class INI_Apply(Link):
     """Apply an INI Tweak."""
     def AppendToMenu(self,menu,window,data):
@@ -11582,7 +11581,7 @@ class Mods_OblivionVersion(Link):
         Link.AppendToMenu(self,menu,window,data)
         menuItem = wx.MenuItem(menu,self.id,self.key,kind=wx.ITEM_CHECK)
         menu.AppendItem(menuItem)
-        menuItem.Enable(bosh.modInfos.voCurrent != None and self.key in bosh.modInfos.voAvailable)
+        menuItem.Enable(bosh.modInfos.voCurrent is not None and self.key in bosh.modInfos.voAvailable)
         if bosh.modInfos.voCurrent == self.key: menuItem.Check()
 
     def Execute(self,event):
@@ -12492,7 +12491,7 @@ class Mod_BaloGroups_Edit(wx.Dialog):
 
     def RefreshButtons(self,index=None):
         """Updates buttons."""
-        if index == None:
+        if index is None:
             index = (self.gList.GetSelections() or (0,))[0]
         self.RefreshBounds(index)
         usedStart,usedStop = self.groups[index][3:5]
@@ -14122,7 +14121,7 @@ class Mod_Patch_Update(Link):
         index = 0
         for name in fullLoadOrder:
             bush.fullLoadOrder[name] = index
-            index = index + 1
+            index += 1
 
         fileName = GPath(self.data[0])
         fileInfo = bosh.modInfos[fileName]
@@ -15796,7 +15795,7 @@ class Save_DiffMasters(Link):
                 message += u'\n* '.join(x.s for x in bosh.modInfos.getOrdered(extra))
             balt.showWryeLog(self.window,message,_(u'Diff Masters'))
 
-#--------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 class Save_Rename(Link):
     """Renames Save File."""
     def AppendToMenu(self,menu,window,data):
@@ -15811,7 +15810,7 @@ class Save_Rename(Link):
             if index != -1:
                 self.window.list.EditLabel(index)
 
-#--------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 class Save_Renumber(Link):
     """Renamumbers a whole lot of save files."""
     def AppendToMenu(self,menu,window,data):
@@ -15845,7 +15844,7 @@ class Save_Renumber(Link):
         bosh.saveInfos.refresh()
         self.window.RefreshUI()
 
-#--------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 class Save_EditCreatedData(balt.ListEditorData):
     """Data capsule for custom item editing dialog."""
     def __init__(self,parent,saveFile,recordTypes):
@@ -15985,7 +15984,7 @@ class Save_EditCreated(Link):
         dialog.ShowModal()
         dialog.Destroy()
 
-#--------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 class Save_EditPCSpellsData(balt.ListEditorData):
     """Data capsule for pc spell editing dialog."""
     def __init__(self,parent,saveInfo):
@@ -16263,12 +16262,12 @@ class Save_RepairFactions(Link):
                     #--Player, player faction
                     if recId == 7:
                         playerStartSpell = saveFile.getIref(0x00000136)
-                        if npc.spells != None and playerStartSpell not in npc.spells:
+                        if npc.spells is not None and playerStartSpell not in npc.spells:
                             log(u'. %08X %s -- **%s**' % (recId,eid._(u'DefaultPlayerSpell')))
                             npc.spells.append(playerStartSpell)
                             refactioned = True #--I'm lying, but... close enough.
                         playerFactionIref = saveFile.getIref(0x0001dbcd)
-                        if (npc.factions != None and
+                        if (npc.factions is not None and
                             playerFactionIref not in [iref for iref,level in npc.factions]
                             ):
                                 log(u'. %08X %s -- **%s**' % (recId,eid,_(u'PlayerFaction, 0')))
@@ -16553,7 +16552,7 @@ class Save_UpdateNPCLevels(Link):
             message += u'\n* '.join(modErrors)
         balt.showOk(self.window,message,_(u'Update NPC Levels'))
 
-# Screen Links ------------------------------------------------------------------
+# Screen Links ----------------------------------------------------------------
 #------------------------------------------------------------------------------
 class Screens_NextScreenShot(Link):
     """Sets screenshot base name and number."""
@@ -16670,7 +16669,7 @@ class Screen_Rename(Link):
             if index != -1:
                 self.window.list.EditLabel(index)
 
-# Messages Links ------------------------------------------------------------------
+# Messages Links --------------------------------------------------------------
 #------------------------------------------------------------------------------
 class Messages_Archive_Import(Link):
     """Import messages from html message archive."""
@@ -16707,7 +16706,7 @@ class Message_Delete(Link):
         #--Refresh stuff
         self.window.RefreshUI()
 
-# People Links ------------------------------------------------------------------
+# People Links ----------------------------------------------------------------
 #------------------------------------------------------------------------------
 class People_AddNew(Link):
     """Add a new record."""
@@ -17013,7 +17012,7 @@ class App_Button(StatusBar_Button):
             idex = (size/8)-2
             self.createButton(window,self.images[idex].GetBitmap(),
                               style=style,tip=self.tip)
-            if self.obseTip != None:
+            if self.obseTip is not None:
                 App_Button.obseButtons.append(self)
                 exeObse = bosh.dirs['app'].join(bush.game.se.exe)
                 if settings.get('bash.obse.on',False) and exeObse.exists():
@@ -17056,7 +17055,7 @@ class App_Button(StatusBar_Button):
                     # Should use the LAA Launcher
                     exePath = exeLaa
                     args = [exePath.s]
-                elif self.obseArg != None and settings.get('bash.obse.on',False) and exeObse.exists():
+                elif self.obseArg is not None and settings.get('bash.obse.on',False) and exeObse.exists():
                     if bosh.inisettings['SteamInstall'] and self.exePath.tail == u'Oblivion.exe':
                         exePath = self.exePath
                     else:
@@ -17333,7 +17332,7 @@ class Obse_Button(StatusBar_Button):
     def SetState(self,state=None):
         """Sets state related info. If newState != none, sets to new state first.
         For convenience, returns state when done."""
-        if state == None: #--Default
+        if state is None: #--Default
             state = settings.get('bash.obse.on',True)
         elif state == -1: #--Invert
             state = not settings.get('bash.obse.on',False)
@@ -17377,7 +17376,7 @@ class LAA_Button(Obse_Button):
     def SetState(self,state=None):
         """Sets state related info.  If newState != none, sets to new state first.
         For convenience, returns state when done."""
-        if state == None: #--Default
+        if state is None: #--Default
             state = settings.get('bash.laa.on',True)
         elif state == -1: #--Invert
             state = not settings.get('bash.laa.on',False)
@@ -17414,7 +17413,7 @@ class AutoQuit_Button(StatusBar_Button):
     def SetState(self,state=None):
         """Sets state related info. If newState != none, sets to new state first.
         For convenience, returns state when done."""
-        if state == None: #--Default
+        if state is None: #--Default
             state = settings.get('bash.autoQuit.on',False)
         elif state == -1: #--Invert
             state = not settings.get('bash.autoQuit.on',False)
@@ -17649,7 +17648,8 @@ class CreateNewProject(wx.Dialog):
         self.textName.Refresh()
 
     def OnCheckBoxChange(self, event):
-        ''' Change the Dialog Icon to represent what the project status will be when created. '''
+        """ Change the Dialog Icon to represent what the project status will
+        be when created. """
         if self.checkEsp.IsChecked():
             if self.checkWizard.IsChecked():
                 self.SetIcon(wx.Icon(bosh.dirs['images'].join(u'diamond_white_off_wiz.png').s,wx.BITMAP_TYPE_PNG))
@@ -17659,7 +17659,7 @@ class CreateNewProject(wx.Dialog):
             self.SetIcon(wx.Icon(bosh.dirs['images'].join(u'diamond_grey_off.png').s,wx.BITMAP_TYPE_PNG))
 
     def OnClose(self,event):
-        ''' Create the New Project and add user specified extras. '''
+        """ Create the New Project and add user specified extras. """
         if event.GetId() == wx.ID_CANCEL:
             event.Skip()
             return
