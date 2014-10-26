@@ -1058,7 +1058,7 @@ class List(wx.Panel):
                         removed += changed
                         balt.showList(self,u'${count} '+_(u'Children deactivated:'),changed,10,fileName.s)
                 except bosh.liblo.LibloError as e:
-                    if (e.msg == 'LIBLO_ERROR_INVALID_ARGS:Plugins may not be sorted before the game\'s master file.'):
+                    if e.msg == 'LIBLO_ERROR_INVALID_ARGS:Plugins may not be sorted before the game\'s master file.':
                         msg = _(u'Plugins may not be sorted before the game\'s master file.')
                     else:
                         msg = e.msg
@@ -1114,7 +1114,7 @@ class List(wx.Panel):
         #--Done
         self.sort = col
         self.colReverse[col] = reverse
-        return (col,reverse)
+        return col,reverse
 
     #--Event Handlers -------------------------------------
     def onUpdateUI(self,event):
@@ -1501,7 +1501,7 @@ class INIList(List):
             elif status == 0: not_applied += 1
             elif status == 10: mismatch += 1
             elif status == 20: applied += 1
-        return (applied,mismatch,not_applied,invalid)
+        return applied,mismatch,not_applied,invalid
 
     def ListTweaks(self):
         """Returns text list of tweaks"""
@@ -1779,7 +1779,7 @@ class ModList(List):
         self.mainMenu = ModList.mainMenu
         self.itemMenu = ModList.itemMenu
         #--Parent init
-        List.__init__(self,parent,wx.ID_ANY,ctrlStyle=(wx.LC_REPORT), dndList=True, dndColumns=['Load Order'])#|wx.SUNKEN_BORDER))
+        List.__init__(self,parent,wx.ID_ANY,ctrlStyle=wx.LC_REPORT, dndList=True, dndColumns=['Load Order'])#|wx.SUNKEN_BORDER))
         #--Image List
         checkboxesIL = colorChecks.GetImageList()
         self.sm_up = checkboxesIL.Add(balt.SmallUpArrow.GetBitmap())
@@ -2408,7 +2408,7 @@ class ModDetails(SashPanel):
             modInfo.header.changed = True
             modInfo.writeHeader()
         #--Change date?
-        if (changeDate or changeHedr or changeMasters):
+        if changeDate or changeHedr or changeMasters:
             newTimeTup = bosh.unformatDate(self.modifiedStr,u'%c')
             newTimeInt = int(time.mktime(newTimeTup))
             modInfo.setmtime(newTimeInt)
@@ -3290,11 +3290,11 @@ class InstallersList(balt.Tank):
         #--Only rename multiple items of the same type
         firstItem = self.data[self.GetSelected()[0]]
         InstallerType = None
-        if(isinstance(firstItem,bosh.InstallerMarker)):
+        if isinstance(firstItem,bosh.InstallerMarker):
             InstallerType = bosh.InstallerMarker
-        elif(isinstance(firstItem,bosh.InstallerArchive)):
+        elif isinstance(firstItem,bosh.InstallerArchive):
             InstallerType = bosh.InstallerArchive
-        elif(isinstance(firstItem,bosh.InstallerProject)):
+        elif isinstance(firstItem,bosh.InstallerProject):
             InstallerType = bosh.InstallerProject
         else:
             event.Veto()
@@ -3968,7 +3968,7 @@ class InstallersPanel(SashTankPanel):
             currentIndex = self.gNotebook.GetSelection()
             for index,(gPage,state) in enumerate(self.infoPages):
                 self.infoPages[index][1] = False
-                if (index == currentIndex): self.RefreshInfoPage(index,installer)
+                if index == currentIndex: self.RefreshInfoPage(index,installer)
                 else: gPage.SetValue(u'')
             #--Sub-Packages
             self.gSubList.Clear()
@@ -4074,7 +4074,7 @@ class InstallersPanel(SashTankPanel):
                 info += _(u'Size: Unrecognized')+u'\n'
             info += (_(u'Modified:')+u' %s\n' % formatDate(installer.modified),
                      _(u'Modified:')+u' N/A\n',)[isinstance(installer,bosh.InstallerMarker)]
-            info += (_(u'Data CRC:')+u' %08X\n' % (installer.crc),
+            info += (_(u'Data CRC:')+u' %08X\n' % installer.crc,
                      _(u'Data CRC:')+u' N/A\n',)[isinstance(installer,bosh.InstallerMarker)]
             info += (_(u'Files:')+u' %s\n' % formatInteger(len(installer.fileSizeCrcs)),
                      _(u'Files:')+u' N/A\n',)[isinstance(installer,bosh.InstallerMarker)]
@@ -5594,7 +5594,7 @@ class BashFrame(wx.Frame):
         if bosh.iniInfos.refresh():
             popInis = 'ALL'
         #--Ensure BSA timestamps are good - Don't touch this for Skyrim though.
-        if( bush.game.fsName != 'Skyrim' ):
+        if bush.game.fsName != 'Skyrim':
             if bosh.inisettings['ResetBSATimestamps']:
                 if bosh.bsaInfos.refresh():
                     bosh.bsaInfos.resetMTimes()
@@ -5857,7 +5857,7 @@ class ListBoxes(wx.Dialog):
             sizer.AddGrowableRow(i)
         okButton = button(self,id=wx.ID_OK,label=labels[wx.ID_OK])
         okButton.SetDefault()
-        buttonSizer = hSizer((balt.spacer),
+        buttonSizer = hSizer(balt.spacer,
                              (okButton,0,wx.ALIGN_RIGHT),
                              )
         for id,label in labels.iteritems():
@@ -5937,21 +5937,16 @@ class ColorDialog(wx.Dialog):
         #--Layout
         sizer = vSizer(
             (hSizer(
-                (self.comboBox,1,wx.EXPAND|wx.RIGHT,5),
-                (self.picker),
+                (self.comboBox,1,wx.EXPAND|wx.RIGHT,5), self.picker,
                 ),0,wx.EXPAND|wx.ALL,5),
             (self.textCtrl,1,wx.EXPAND|wx.ALL,5),
             (hSizer(
                 (self.defaultAll,0,wx.RIGHT,5),
-                (self.applyAll,0,wx.RIGHT,5),
-                (self.exportConfig),
+                (self.applyAll,0,wx.RIGHT,5), self.exportConfig,
                 ),0,wx.EXPAND|wx.ALL,5),
             (hSizer(
                 (self.default,0,wx.RIGHT,5),
-                (self.apply,0,wx.RIGHT,5),
-                (self.importConfig),
-                (spacer),
-                (self.ok),
+                (self.apply,0,wx.RIGHT,5), self.importConfig, spacer, self.ok,
                 ),0,wx.EXPAND|wx.ALL,5),
             )
         self.comboBox.SetFocus()
@@ -6209,7 +6204,7 @@ class DocBrowser(wx.Frame):
         try:
             with docPath.open('r',encoding='utf-8-sig') as textFile:
                 maText = re.match(ur'^=.+=#\s*$',textFile.readline(),re.U)
-            return (maText is not None)
+            return maText is not None
         except UnicodeDecodeError:
             return False
 
@@ -6509,7 +6504,7 @@ class ModChecker(wx.Frame):
         text = re.sub(u'(__|\*\*|~~)',u'',text,re.U)
         text = re.sub(u'&bull; &bull;',u'**',text,re.U)
         text = re.sub(u'<[^>]+>','',text,re.U)
-        if (wx.TheClipboard.Open()):
+        if wx.TheClipboard.Open():
             wx.TheClipboard.SetData(wx.TextDataObject(text))
             wx.TheClipboard.Close()
 
@@ -7236,7 +7231,7 @@ class PatchDialog(wx.Dialog):
                     try:
                         patcher.gTweakList.Check(index,item.isEnabled)
                         patcher.gTweakList.SetString(index,item.getListLabel())
-                    except: deprint(_(u'item %s not in saved configs') % (item))
+                    except: deprint(_(u'item %s not in saved configs') % item)
         self.SetOkEnable()
 
     def UpdateConfig(self,patchConfigs,event=None):
@@ -7935,7 +7930,7 @@ class TweakPatcher(Patcher):
             menulabel = tweak.getListLabel() + u' %s' % tweak.choiceValues[index][0]
         else:
             menulabel = tweak.getListLabel() + u' %4.2f ' % tweak.choiceValues[index][0]
-        self.gTweakList.SetString(tweakIndex,(menulabel))
+        self.gTweakList.SetString(tweakIndex, menulabel)
 
     def TweakSelectAll(self,event=None):
         """'Select All' Button was pressed, update all configChecks states."""
@@ -8233,7 +8228,7 @@ class Files_Open(Link):
     """Opens data directory in explorer."""
     def AppendToMenu(self,menu,window,data):
         Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Open...'), _(u"Open '%s'") % (window.data.dir.tail))
+        menuItem = wx.MenuItem(menu,self.id,_(u'Open...'), _(u"Open '%s'") % window.data.dir.tail)
         menu.AppendItem(menuItem)
 
     def Execute(self,event):
@@ -8253,7 +8248,7 @@ class Files_SortBy(Link):
 
     def AppendToMenu(self,menu,window,data):
         Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,self.prefix+self.sortName,_(u'Sort by %s') % (self.sortName),kind=wx.ITEM_RADIO)
+        menuItem = wx.MenuItem(menu,self.id,self.prefix+self.sortName,_(u'Sort by %s') % self.sortName,kind=wx.ITEM_RADIO)
         menu.AppendItem(menuItem)
         if window.sort == self.sortCol: menuItem.Check()
 
@@ -8420,7 +8415,7 @@ class File_Duplicate(Link):
             if (destDir == fileInfo.dir) and (destName == fileName):
                 balt.showError(self.window,_(u"Files cannot be duplicated to themselves!"))
                 continue
-            if(fileInfo.isMod()):
+            if fileInfo.isMod():
                 newTime = bosh.modInfos.getFreeTime(fileInfo.getPath().mtime)
             else:
                 newTime = '+1'
@@ -8485,7 +8480,7 @@ class File_ListMasters(Link):
         fileName = GPath(self.data[0])
         fileInfo = self.window.data[fileName]
         text = bosh.modInfos.getModList(fileInfo=fileInfo)
-        if (wx.TheClipboard.Open()):
+        if wx.TheClipboard.Open():
             wx.TheClipboard.SetData(wx.TextDataObject(text))
             wx.TheClipboard.Close()
         balt.showLog(self.window,text,fileName.s,asDialog=False,fixedFont=False,icons=bashBlue)
@@ -9739,14 +9734,14 @@ class Installer_Rename(InstallerLink):
         self.InstallerType = None
         ##Only enable if all selected items are of the same type
         firstItem = window.data[window.GetSelected()[0]]
-        if(isinstance(firstItem,bosh.InstallerMarker)):
+        if isinstance(firstItem,bosh.InstallerMarker):
             self.InstallerType = bosh.InstallerMarker
-        elif(isinstance(firstItem,bosh.InstallerArchive)):
+        elif isinstance(firstItem,bosh.InstallerArchive):
             self.InstallerType = bosh.InstallerArchive
-        elif(isinstance(firstItem,bosh.InstallerProject)):
+        elif isinstance(firstItem,bosh.InstallerProject):
             self.InstallerType = bosh.InstallerProject
 
-        if(self.InstallerType):
+        if self.InstallerType:
             for item in window.GetSelected():
                 if not isinstance(window.data[item],self.InstallerType):
                     menuItem.Enable(False)
@@ -9899,7 +9894,7 @@ class Installer_ListPackages(InstallerLink):
         if balt.askYes(self.gTank,message,_(u'Only Show Installed?')):
             text = self.data.getPackageList(False)
         else: text = self.data.getPackageList()
-        if (wx.TheClipboard.Open()):
+        if wx.TheClipboard.Open():
             wx.TheClipboard.SetData(wx.TextDataObject(text))
             wx.TheClipboard.Close()
         balt.showLog(self.gTank,text,_(u'BAIN Packages'),asDialog=False,fixedFont=False,icons=bashBlue)
@@ -9923,7 +9918,7 @@ class Installer_ListStructure(InstallerLink):   # Provided by Waruddar
         text = installer.listSource(archive)
 
         #--Get masters list
-        if (wx.TheClipboard.Open()):
+        if wx.TheClipboard.Open():
             wx.TheClipboard.SetData(wx.TextDataObject(text))
             wx.TheClipboard.Close()
         balt.showLog(self.gTank,text,_(u'Package Structure'),asDialog=False,fixedFont=False,icons=bashBlue)
@@ -9965,7 +9960,7 @@ class Installer_Open(balt.Tank_Open):
     """Open selected file(s)."""
     def AppendToMenu(self,menu,window,data):
         Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Open...'), _(u"Open '%s'") % (self.data.dir.tail))
+        menuItem = wx.MenuItem(menu,self.id,_(u'Open...'), _(u"Open '%s'") % self.data.dir.tail)
         menu.AppendItem(menuItem)
         self.selected = [x for x in self.selected if not isinstance(self.data.data[x],bosh.InstallerMarker)]
         menuItem.Enable(bool(self.selected))
@@ -10154,7 +10149,7 @@ class Installer_CopyConflicts(InstallerLink):
                 numFiles = 0
                 curFile = 1
                 srcOrder = srcInstaller.order
-                destDir = GPath(u"%03d - Conflicts" % (srcOrder))
+                destDir = GPath(u"%03d - Conflicts" % srcOrder)
                 getArchiveOrder = lambda y: data[y].order
                 for package in sorted(data.data,key=getArchiveOrder):
                     installer = data[package]
@@ -10337,11 +10332,11 @@ class Installer_Espm_List(InstallerLink):
 
     def Execute(self,event):
         """Handle selection."""
-        subs = _(u'Esp/m List for %s:') % (gInstallers.data[gInstallers.detailsItem].archive) + u'\n[spoiler]\n'
+        subs = _(u'Esp/m List for %s:') % gInstallers.data[gInstallers.detailsItem].archive + u'\n[spoiler]\n'
         for index in range(gInstallers.gEspmList.GetCount()):
             subs += [u'   ',u'** '][gInstallers.gEspmList.IsChecked(index)] + gInstallers.gEspmList.GetString(index) + '\n'
         subs += u'[/spoiler]'
-        if (wx.TheClipboard.Open()):
+        if wx.TheClipboard.Open():
             wx.TheClipboard.SetData(wx.TextDataObject(subs))
             wx.TheClipboard.Close()
         balt.showLog(self.window,subs,_(u'Esp/m List'),asDialog=False,fixedFont=False,icons=bashBlue)
@@ -10413,11 +10408,11 @@ class Installer_Subs_ListSubPackages(InstallerLink):
     def Execute(self,event):
         """Handle selection."""
         installer = gInstallers.data[gInstallers.detailsItem]
-        subs = _(u'Sub-Packages List for %s:') % (installer.archive) + u'\n[spoiler]\n'
+        subs = _(u'Sub-Packages List for %s:') % installer.archive + u'\n[spoiler]\n'
         for index in xrange(gInstallers.gSubList.GetCount()):
             subs += [u'   ',u'** '][gInstallers.gSubList.IsChecked(index)] + gInstallers.gSubList.GetString(index) + u'\n'
         subs += u'[/spoiler]'
-        if (wx.TheClipboard.Open()):
+        if wx.TheClipboard.Open():
             wx.TheClipboard.SetData(wx.TextDataObject(subs))
             wx.TheClipboard.Close()
         balt.showLog(self.window,subs,_(u'Sub-Package Lists'),asDialog=False,fixedFont=False,icons=bashBlue)
@@ -10801,9 +10796,9 @@ class InstallerConverter_Apply(InstallerLink):
             if hasattr(self.converter, 'hasBCF') and not self.converter.hasBCF:
                 deprint(u'An error occued while attempting to apply an Auto-BCF:',traceback=True)
                 balt.showWarning(self.gTank,
-                    _(u'%s: An error occured while applying an Auto-BCF.' %
-                      (destArchive.s)))
-                # hasBCF will be set to False if there is an error while rearranging files
+                    _(u'%s: An error occured while applying an Auto-BCF.' % destArchive.s))
+                # hasBCF will be set to False if there is an error while
+                # rearranging files
                 return
             #--Add the new archive to Bash
             if destArchive not in self.data:
@@ -10987,7 +10982,7 @@ class InstallerConverter_Create(InstallerLink):
             log(u'  *  '+_(u'Has Esps Unselected')+u'   = %s'%bool(converter.espmNots))
             log(u'  *  '+_(u'Has Packages Selected')+u' = %s'%bool(converter.subActives))
             log.setHeader(u'. '+_(u'Contains')+u': %s'%formatInteger(len(converter.missingFiles))+ (_(u'file'),_(u'files'))[len(converter.missingFiles) > 1])
-            log(u'  * '+u'\n  * '.join(sorted(u'%s' % (x) for x in converter.missingFiles)))
+            log(u'  * '+u'\n  * '.join(sorted(u'%s' % x for x in converter.missingFiles)))
         finally:
             progress.Destroy()
             if log:
@@ -11192,7 +11187,7 @@ class INI_ListINIs(Link):
     def Execute(self,event):
         """Handle printing out the errors."""
         text = iniList.ListTweaks()
-        if (wx.TheClipboard.Open()):
+        if wx.TheClipboard.Open():
             wx.TheClipboard.SetData(wx.TextDataObject(text))
             wx.TheClipboard.Close()
         balt.showLog(self.window,text,_(u'Active INIs'),asDialog=False,fixedFont=False,icons=bashBlue)
@@ -11214,7 +11209,7 @@ class INI_ListErrors(Link):
 
     def Execute(self,event):
         """Handle printing out the errors."""
-        if (wx.TheClipboard.Open()):
+        if wx.TheClipboard.Open():
             text = u''
             for i in self.data:
                 fileInfo = bosh.iniInfos[i]
@@ -11530,7 +11525,7 @@ class Mods_ListMods(Link):
     def Execute(self,event):
         #--Get masters list
         text = bosh.modInfos.getModList(showCRC=wx.GetKeyState(67))
-        if (wx.TheClipboard.Open()):
+        if wx.TheClipboard.Open():
             wx.TheClipboard.SetData(wx.TextDataObject(text))
             wx.TheClipboard.Close()
         balt.showLog(self.window,text,_(u"Active Mod Files"),asDialog=False,fixedFont=False,icons=bashBlue)
@@ -11547,7 +11542,7 @@ class Mods_ListBashTags(Link):
     def Execute(self,event):
         #--Get masters list
         text = bosh.modInfos.getTagList()
-        if (wx.TheClipboard.Open()):
+        if wx.TheClipboard.Open():
             wx.TheClipboard.SetData(wx.TextDataObject(text))
             wx.TheClipboard.Close()
         balt.showLog(self.window,text,_(u"Bash Tags"),asDialog=False,fixedFont=False,icons=bashBlue)
@@ -12735,7 +12730,7 @@ class Mod_CreateBOSSReport(Link):
         if spoiler: text += u'[/spoiler]'
 
         # Show results + copy to clipboard
-        if (wx.TheClipboard.Open()):
+        if wx.TheClipboard.Open():
             wx.TheClipboard.SetData(wx.TextDataObject(text))
             wx.TheClipboard.Close()
         balt.showLog(self.window,text,_(u'BOSS Report'),asDialog=False,fixedFont=False,icons=bashBlue)
@@ -12815,7 +12810,7 @@ class Mod_CopyModInfo(Link):
         if spoiler: text += u'[/spoiler]'
 
         # Show results + copy to clipboard
-        if (wx.TheClipboard.Open()):
+        if wx.TheClipboard.Open():
             wx.TheClipboard.SetData(wx.TextDataObject(text))
             wx.TheClipboard.Close()
         balt.showLog(self.window,text,_(u'Mod Info Report'),asDialog=False,
@@ -12835,7 +12830,7 @@ class Mod_ListBashTags(Link):
         for fileName in self.data:
             files.append(bosh.modInfos[fileName])
         text = bosh.modInfos.getTagList(files)
-        if (wx.TheClipboard.Open()):
+        if wx.TheClipboard.Open():
             wx.TheClipboard.SetData(wx.TextDataObject(text))
             wx.TheClipboard.Close()
         balt.showLog(self.window,text,_(u"Bash Tags"),asDialog=False,fixedFont=False,icons=bashBlue)
@@ -14356,7 +14351,7 @@ class Mod_ListPatchConfig(Link):
                         clip.write(u'    %s\n' % item)
         #-- Show log
         clip.write(u'[/xml][/spoiler]')
-        if (wx.TheClipboard.Open()):
+        if wx.TheClipboard.Open():
             wx.TheClipboard.SetData(wx.TextDataObject(clip.getvalue()))
             wx.TheClipboard.Close()
         clip.close()
@@ -15003,7 +14998,7 @@ class CBash_Mod_MapMarkers_Import(Link):
             buff.write((_(u'Imported Map Markers to mod %s:')
                         + u'\n') % (fileName.s,))
             for eid in sorted(changed):
-                buff.write(u'* %s\n' % (eid))
+                buff.write(u'* %s\n' % eid)
             balt.showLog(self.window,buff.getvalue(),_(u'Import Map Markers'),
                          icons=bashBlue)
             buff.close()
@@ -15135,7 +15130,7 @@ class Mod_SigilStoneDetails_Import(Link):
             buff.write((_(u'Imported Sigil Stone details to mod %s:')
                         +u'\n') % fileName.s)
             for eid in sorted(changed):
-                buff.write(u'* %s\n' % (eid))
+                buff.write(u'* %s\n' % eid)
             balt.showLog(self.window,buff.getvalue(),
                          _(u'Import Sigil Stone details'),icons=bashBlue)
             buff.close()
@@ -15238,8 +15233,9 @@ class Mod_SpellRecords_Import(Link):
             buff.write((_(u'Imported Spell details to mod %s:')
                         +u'\n') % fileName.s)
             for eid in sorted(changed):
-                buff.write(u'* %s\n' % (eid))
+                buff.write(u'* %s\n' % eid)
             balt.showLog(self.window,buff.getvalue(),_(u'Import Spell details'),
+
                          icons=bashBlue)
             buff.close()
 
@@ -15331,7 +15327,7 @@ class Mod_IngredientDetails_Import(Link):
             buff.write((_(u'Imported Ingredient details to mod %s:')
                         + u'\n') % fileName.s)
             for eid in sorted(changed):
-                buff.write(u'* %s\n' % (eid))
+                buff.write(u'* %s\n' % eid)
             balt.showLog(self.window,buff.getvalue(),
                 _(u'Import Ingredient details'),icons=bashBlue)
             buff.close()
@@ -17206,9 +17202,9 @@ class App_Tes4View(App_Button):
 #  or name ends with Trans.exe
     def __init__(self,*args,**kwdargs):
         App_Button.__init__(self,*args,**kwdargs)
-        if( bush.game.fsName == 'Skyrim' ):
+        if bush.game.fsName == 'Skyrim':
             self.mainMenu.append(Mods_Tes5ViewExpert())
-        elif( bush.game.fsName == 'Oblivion' or bush.game.fsName == 'Nehrim' ):
+        elif bush.game.fsName == 'Oblivion' or bush.game.fsName == 'Nehrim':
             self.mainMenu.append(Mods_Tes4ViewExpert())
 
     def IsPresent(self):
@@ -17226,10 +17222,10 @@ class App_Tes4View(App_Button):
             extraArgs.append(u'-FixupPGRD')
         if wx.GetKeyState(wx.WXK_SHIFT):
             extraArgs.append(u'-skipbsa')
-        if( bush.game.fsName == 'Oblivion' or bush.game.fsName == 'Nehrim' ):
+        if bush.game.fsName == 'Oblivion' or bush.game.fsName == 'Nehrim':
             if settings['tes4View.iKnowWhatImDoing']:
                 extraArgs.append(u'-IKnowWhatImDoing')
-        if( bush.game.fsName == 'Skyrim' ):
+        if bush.game.fsName == 'Skyrim':
             if settings['tes5View.iKnowWhatImDoing']:
                 extraArgs.append(u'-IKnowWhatImDoing')
         App_Button.Execute(self,event,tuple(extraArgs))
@@ -18342,8 +18338,7 @@ def InitStatusBar():
             BashStatusBar.buttons.append(
                 App_Button(
                     (path,()),
-                    icon,
-                    (description),
+                    icon, description,
                     canHide=False
                     ))
     #--Final couple
