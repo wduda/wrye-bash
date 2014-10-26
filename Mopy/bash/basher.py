@@ -7903,10 +7903,11 @@ class File_Delete(_Link):
 #------------------------------------------------------------------------------
 class File_Duplicate(_Link):
     """Create a duplicate of the file."""
-    def AppendToMenu(self,menu,window,data):# TODO: is title used ? Link.AppendToMenu will reset it
-        self.text = self.title = (_(u'Duplicate'),_(u'Duplicate...'))[len(data) == 1]
+    def AppendToMenu(self,menu,window,data):
+        self.text = (_(u'Duplicate'),_(u'Duplicate...'))[len(data) == 1]
         self.help = _(u"Make a copy of '%s'") % (data[0])
         _Link.AppendToMenu(self,menu,window,data)
+        self.title = self.text # TODO: is title used ? Link.AppendToMenu will reset it
 
     def Execute(self,event):
         data = self.data
@@ -8104,9 +8105,10 @@ class File_Snapshot(_Link):
     """Take a snapshot of the file."""
     help = _(u"Creates a snapshot copy of the current mod in a subdirectory (Bash\Snapshots).")
 
-    def AppendToMenu(self,menu,window,data): # TODO: is title used ? Link.AppendToMenu will reset it
-        self.text = self.title = (_(u'Snapshot'),_(u'Snapshot...'))[len(data) == 1]
+    def AppendToMenu(self,menu,window,data):
+        self.text = (_(u'Snapshot'),_(u'Snapshot...'))[len(data) == 1]
         _Link.AppendToMenu(self,menu,window,data)
+        self.title = self.text # TODO: is title used ? Link.AppendToMenu will reset it
 
     def Execute(self,event):
         data = self.data
@@ -8698,7 +8700,7 @@ class Installers_AvoidOnStart(BoolLink):
                                           )
 
 #------------------------------------------------------------------------------
-class Installers_Refresh(Link):
+class Installers_Refresh(_Link):
     """Refreshes all Installers data."""
     def __init__(self,fullRefresh=False):
         Link.__init__(self)
@@ -8706,20 +8708,18 @@ class Installers_Refresh(Link):
 
     def AppendToMenu(self,menu,window,data):
         if not settings['bash.installers.enabled']: return
-        Link.AppendToMenu(self,menu,window,data)
-        self.title = (_(u'Refresh Data'),_(u'Full Refresh'))[self.fullRefresh]
-        if self.fullRefresh:
-            help = _(u"Perform a full refresh of all data files, recalculating all CRCs.  This can take 5-15 minutes.")
-        else:
-            help = _(u"Rescan the Data directory and all project directories.")
-        menuItem = wx.MenuItem(menu,self.id,self.title,help)
-        menu.AppendItem(menuItem)
+        self.text = (_(u'Refresh Data'),_(u'Full Refresh'))[self.fullRefresh]
+        self.help = _(
+            u"Perform a full refresh of all data files, recalculating all "
+            u"CRCs.  This can take 5-15 minutes.") if self.fullRefresh else _(
+            u"Rescan the Data directory and all project directories.")
+        _Link.AppendToMenu(self,menu,window,data)
 
     def Execute(self,event):
         """Handle selection."""
         if self.fullRefresh:
             message = balt.fill(_(u"Refresh ALL data from scratch? This may take five to ten minutes (or more) depending on the number of mods you have installed."))
-            if not balt.askWarning(self.gTank,fill(message,80),self.title): return
+            if not balt.askWarning(self.gTank,fill(message,80),self.text): return
         gInstallers.refreshed = False
         gInstallers.fullRefresh = self.fullRefresh
         gInstallers.OnShow()
