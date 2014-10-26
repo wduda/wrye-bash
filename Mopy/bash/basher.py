@@ -1521,7 +1521,7 @@ class INIList(List):
         if detail == 'SAME':
             selected = set(self.GetSelected())
         else:
-            selected = set([detail])
+            selected = {detail}
         #--Populate
         if files == 'VALID':
             files = [GPath(self.items[x]) for x in xrange(len(self.items)) if self.data[GPath(self.items[x])].status >= 0]
@@ -1829,7 +1829,7 @@ class ModList(List):
         if detail == 'SAME':
             selected = set(self.GetSelected())
         else:
-            selected = set([detail])
+            selected = {detail}
         #--Populate
         if files == 'ALL':
             self.PopulateItems(selected=selected)
@@ -2479,7 +2479,7 @@ class ModDetails(SashPanel):
             # Disable autoBashTags
             bosh.modInfos.table.setItem(self.modInfo.name,'autoBashTags',False)
         tag = self.allTags[event.GetId()-ID_TAGS.BASE]
-        modTags = self.modTags ^ set((tag,))
+        modTags = self.modTags ^ {tag}
         self.modInfo.setBashTags(modTags)
         modList.RefreshUI(self.modInfo.name)
 
@@ -2856,7 +2856,7 @@ class SaveList(List):
         if detail == 'SAME':
             selected = set(self.GetSelected())
         else:
-            selected = set([detail])
+            selected = {detail}
         #--Populate
         if files == 'ALL':
             self.PopulateItems(selected=selected)
@@ -4266,7 +4266,7 @@ class ScreensList(List):
         if detail == 'SAME':
             selected = set(self.GetSelected())
         else:
-            selected = set([detail])
+            selected = {detail}
         #--Populate
         if files == 'ALL':
             self.PopulateItems(selected=selected)
@@ -4445,7 +4445,7 @@ class BSAList(List):
         if detail == 'SAME':
             selected = set(self.GetSelected())
         else:
-            selected = set([detail])
+            selected = {detail}
         #--Populate
         if files == 'ALL':
             self.PopulateItems(selected=selected)
@@ -4754,7 +4754,7 @@ class MessageList(List):
         if detail == 'SAME':
             selected = set(self.GetSelected())
         else:
-            selected = set([detail])
+            selected = {detail}
         #--Populate
         if files == 'ALL':
             self.PopulateItems(selected=selected)
@@ -7706,7 +7706,7 @@ class ListPatcher(Patcher):
         item =self.items[itemIndex]
         choice = self.choiceMenu[event.GetId()]
         choiceSet = self.configChoices[item]
-        choiceSet ^= set((choice,))
+        choiceSet ^= {choice}
         if choice != u'Auto':
             choiceSet.discard(u'Auto')
         elif u'Auto' in self.configChoices[item]:
