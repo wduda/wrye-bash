@@ -7733,8 +7733,21 @@ def SetUAC(item):
         else:
             balt.setUAC(item,isUAC)
 
-class BoolLink(Link):
+class _Link(Link): # TODO: merge with balt.Link !
+    """TMP class to factor out duplicate code and wx dependencies."""
+    kind = wx.ITEM_NORMAL  # the default in wx.MenuItem(... kind=...)
+    # subclasses MUST define self.text, self.help OR override AppendToMenu()
+
+    def AppendToMenu(self,menu,window,data):
+        Link.AppendToMenu(self,menu,window,data)
+        menuItem = wx.MenuItem(menu, self.id, self.text, self.help, self.kind)
+        menu.AppendItem(menuItem)
+        return menuItem
+
+class BoolLink(_Link):
     """Simple link that just toggles a setting."""
+    kind=wx.ITEM_CHECK
+
     def __init__(self, text, key, help='', opposite=False):
         Link.__init__(self)
         self.text = text
@@ -7743,21 +7756,20 @@ class BoolLink(Link):
         self.opposite = opposite
 
     def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,self.text,self.help,kind=wx.ITEM_CHECK)
-        menu.AppendItem(menuItem)
+        menuItem = _Link.AppendToMenu(self,menu,window,data)
         menuItem.Check(settings[self.key] ^ self.opposite)
 
     def Execute(self,event):
         settings[self.key] ^= True
 
 #------------------------------------------------------------------------------
-class Files_Open(Link):
+class Files_Open(_Link):
     """Opens data directory in explorer."""
+    text = _(u'Open...')
+
     def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Open...'), _(u"Open '%s'") % window.data.dir.tail)
-        menu.AppendItem(menuItem)
+        self.help = _(u"Open '%s'") % window.data.dir.tail
+        _Link.AppendToMenu(self,menu,window,data)
 
     def Execute(self,event):
         """Handle selection."""
@@ -7766,18 +7778,20 @@ class Files_Open(Link):
         dir.start()
 
 #------------------------------------------------------------------------------
-class Files_SortBy(Link):
+class Files_SortBy(_Link):
     """Sort files by specified key (sortCol)."""
+    kind=wx.ITEM_RADIO
+
     def __init__(self,sortCol,prefix=''):
         Link.__init__(self)
         self.sortCol = sortCol
         self.sortName = settings['bash.colNames'][sortCol]
         self.prefix = prefix
+        self.text = self.prefix + self.sortName
+        self.help = _(u'Sort by %s') % self.sortName
 
     def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,self.prefix+self.sortName,_(u'Sort by %s') % self.sortName,kind=wx.ITEM_RADIO)
-        menu.AppendItem(menuItem)
+        menuItem = _Link.AppendToMenu(self,menu,window,data)
         if window.sort == self.sortCol: menuItem.Check()
 
     def Execute(self,event):
@@ -7787,16 +7801,13 @@ class Files_SortBy(Link):
             self.window.PopulateItems(self.sortCol,-1)
 
 #------------------------------------------------------------------------------
-class Files_Unhide(Link):
+class Files_Unhide(_Link):
     """Unhide file(s). (Move files back to Data Files or Save directory.)"""
     def __init__(self,type):
         Link.__init__(self)
         self.type = type
-
-    def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u"Unhide..."), _(u"Unhides hidden %ss.") % self.type)
-        menu.AppendItem(menuItem)
+        self.text = _(u"Unhide...")
+        self.help = _(u"Unhides hidden %ss.") % self.type
 
     def Execute(self,event):
         srcDir = bosh.dirs['modsBash'].join(u'Hidden')
@@ -7862,13 +7873,13 @@ class Files_Unhide(Link):
 
 # File Links ------------------------------------------------------------------
 #------------------------------------------------------------------------------
-class File_Delete(Link):
+class File_Delete(_Link):
     """Delete the file and all backups."""
+    text = _(u'Delete')
+
     def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Delete'),
-                               help=_(u"Delete %(filename)s.") % ({'filename':data[0]}))
-        menu.AppendItem(menuItem)
+        self.help = _(u"Delete %(filename)s.") % ({'filename': data[0]})
+        _Link.AppendToMenu(self,menu,window,data)
 
     def Execute(self,event):
         message = [u'',_(u'Uncheck files to skip deleting them if desired.')]
@@ -7890,13 +7901,12 @@ class File_Delete(Link):
         dialog.Destroy()
 
 #------------------------------------------------------------------------------
-class File_Duplicate(Link):
+class File_Duplicate(_Link):
     """Create a duplicate of the file."""
-    def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        self.title = (_(u'Duplicate'),_(u'Duplicate...'))[len(data) == 1]
-        menuItem = wx.MenuItem(menu,self.id,self.title, _(u"Make a copy of '%s'") % (data[0]))
-        menu.AppendItem(menuItem)
+    def AppendToMenu(self,menu,window,data):# TODO: is title used ? Link.AppendToMenu will reset it
+        self.text = self.title = (_(u'Duplicate'),_(u'Duplicate...'))[len(data) == 1]
+        self.help = _(u"Make a copy of '%s'") % (data[0])
+        _Link.AppendToMenu(self,menu,window,data)
 
     def Execute(self,event):
         data = self.data
@@ -7957,13 +7967,13 @@ class File_Duplicate(Link):
             self.window.RefreshUI()
 
 #------------------------------------------------------------------------------
-class File_Hide(Link):
+class File_Hide(_Link):
     """Hide the file. (Move it to Bash/Hidden directory.)"""
+    text = _(u'Hide')
+
     def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Hide'),
-                               help=_(u"Move %(filename)s to the Bash/Hidden directory.") % ({'filename':data[0]}))
-        menu.AppendItem(menuItem)
+        self.help = _(u"Move %(filename)s to the Bash/Hidden directory.") % ({'filename':data[0]})
+        _Link.AppendToMenu(self,menu,window,data)
 
     def Execute(self,event):
         if not bosh.inisettings['SkipHideConfirmation']:
@@ -7995,13 +8005,13 @@ class File_Hide(Link):
         bashFrame.RefreshData()
 
 #------------------------------------------------------------------------------
-class File_ListMasters(Link):
+class File_ListMasters(_Link):
     """Copies list of masters to clipboard."""
+    text = _(u"List Masters...")
+
     def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u"List Masters..."),
-                help=_(u"Copies list of %(filename)s's masters to the clipboard.") % ({'filename':data[0]}))
-        menu.AppendItem(menuItem)
+        self.help = _(u"Copies list of %(filename)s's masters to the clipboard.") % ({'filename':data[0]})
+        menuItem = _Link.AppendToMenu(self,menu,window,data)
         if len(data) != 1: menuItem.Enable(False)
 
     def Execute(self,event):
@@ -8014,15 +8024,14 @@ class File_ListMasters(Link):
         balt.showLog(self.window,text,fileName.s,asDialog=False,fixedFont=False,icons=bashBlue)
 
 #------------------------------------------------------------------------------
-class File_Redate(Link):
+class File_Redate(_Link):
     """Move the selected files to start at a specified date."""
+    text = _(u'Redate...')
+    help = _(u"Move the selected files to start at a specified date.")
+
     def AppendToMenu(self,menu,window,data):
-        if bosh.lo.LoadOrderMethod == bosh.liblo.LIBLO_METHOD_TEXTFILE:
-            return
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Redate...'),
-                help=_(u"Move the selected files to start at a specified date."))
-        menu.AppendItem(menuItem)
+        if not bosh.lo.LoadOrderMethod == bosh.liblo.LIBLO_METHOD_TEXTFILE:
+            _Link.AppendToMenu(self,menu,window,data)
 
     def Execute(self,event):
         #--Get current start time.
@@ -8054,13 +8063,13 @@ class File_Redate(Link):
         self.window.RefreshUI()
 
 #------------------------------------------------------------------------------
-class File_Sort(Link):
+class File_Sort(_Link):
     """Sort the selected files."""
+    text = _(u'Sort')
+    help = _(u"Sort the selected files.")
+
     def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Sort'),
-                help=_(u"sort the selected files."))
-        menu.AppendItem(menuItem)
+        menuItem = _Link.AppendToMenu(self,menu,window,data)
         if len(data) < 2: menuItem.Enable(False)
 
     def Execute(self,event):
@@ -8091,14 +8100,13 @@ class File_Sort(Link):
         self.window.RefreshUI()
 
 #------------------------------------------------------------------------------
-class File_Snapshot(Link):
+class File_Snapshot(_Link):
     """Take a snapshot of the file."""
-    def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        self.title = (_(u'Snapshot'),_(u'Snapshot...'))[len(data) == 1]
-        menuItem = wx.MenuItem(menu,self.id,self.title,
-            help=_(u"Creates a snapshot copy of the current mod in a subdirectory (Bash\Snapshots)."))
-        menu.AppendItem(menuItem)
+    help = _(u"Creates a snapshot copy of the current mod in a subdirectory (Bash\Snapshots).")
+
+    def AppendToMenu(self,menu,window,data): # TODO: is title used ? Link.AppendToMenu will reset it
+        self.text = self.title = (_(u'Snapshot'),_(u'Snapshot...'))[len(data) == 1]
+        _Link.AppendToMenu(self,menu,window,data)
 
     def Execute(self,event):
         data = self.data
@@ -8132,14 +8140,14 @@ class File_Snapshot(Link):
             self.window.data.copy(fileName,destDir,destName)
 
 #------------------------------------------------------------------------------
-class File_RevertToSnapshot(Link):
+class File_RevertToSnapshot(_Link):
     """Revert to Snapshot."""
+    text = _(u'Revert to Snapshot...')
+    help = _(u"Revert to a previously created snapshot from the Bash/Snapshots dir.")
+
     def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Revert to Snapshot...'),
-            help=_(u"Revert to a previously created snapshot from the Bash/Snapshots dir."))
+        menuItem = _Link.AppendToMenu(self,menu,window,data)
         menuItem.Enable(len(self.data) == 1)
-        menu.AppendItem(menuItem)
 
     def Execute(self,event):
         """Handle menu item selection."""
@@ -8171,13 +8179,10 @@ class File_RevertToSnapshot(Link):
             self.window.RefreshUI(fileName)
 
 #------------------------------------------------------------------------------
-class File_Backup(Link):
+class File_Backup(_Link):
     """Backup file."""
-    def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Backup'),
-            help=_(u"Create a backup of the slected file(s)."))
-        menu.AppendItem(menuItem)
+    text = _(u'Backup')
+    help = _(u"Create a backup of the slected file(s).")
 
     def Execute(self,event):
         for item in self.data:
@@ -8231,16 +8236,14 @@ class File_RevertToBackup:
                 self.window.RefreshUI(fileName)
 
 #------------------------------------------------------------------------------
-class File_Open(Link):
+class File_Open(_Link):
     """Open specified file(s)."""
+    text = _(u'Open...')
+
     def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        if len(data) == 1:
-            help = _(u"Open '%s' with the system's default program.") % data[0]
-        else:
-            help = _(u'Open the selected files.')
-        menuItem = wx.MenuItem(menu,self.id,_(u'Open...'),help)
-        menu.AppendItem(menuItem)
+        self.help = _(u"Open '%s' with the system's default program.") % data[
+            0] if len(data) == 1 else _(u'Open the selected files.')
+        menuItem = _Link.AppendToMenu(self,menu,window,data)
         menuItem.Enable(len(self.data)>0)
 
     def Execute(self,event):
@@ -8249,7 +8252,9 @@ class File_Open(Link):
         for file in self.data:
             dir.join(file).start()
 #------------------------------------------------------------------------------
-class List_Column(Link):
+class List_Column(_Link):
+    kind = wx.ITEM_CHECK
+
     def __init__(self,columnsKey,allColumnsKey,colName,enable=True):
         Link.__init__(self)
         self.colName = colName
@@ -8258,14 +8263,11 @@ class List_Column(Link):
         self.enable = enable
 
     def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        colName = settings['bash.colNames'][self.colName]
-        check = self.colName in settings[self.columnsKey]
-        help = _(u"Show/Hide '%s' column.") % colName
-        menuItem = wx.MenuItem(menu,self.id,colName,help,kind=wx.ITEM_CHECK)
+        self.text = settings['bash.colNames'][self.colName]
+        self.help = _(u"Show/Hide '%s' column.") % self.text
+        menuItem = _Link.AppendToMenu(self,menu,window,data)
         menuItem.Enable(self.enable)
-        menu.AppendItem(menuItem)
-        menuItem.Check(check)
+        menuItem.Check(self.colName in settings[self.columnsKey])
 
     def Execute(self,event):
         if self.colName in settings[self.columnsKey]:
@@ -8279,7 +8281,7 @@ class List_Column(Link):
 
 #------------------------------------------------------------------------------
 
-class List_Columns(Link):
+class List_Columns(Link): # FIXME: wx in AppendToMenu !!!
     """Customize visible columns."""
     def __init__(self,columnsKey,allColumnsKey,persistantColumns=[]):
         Link.__init__(self)
@@ -8296,12 +8298,10 @@ class List_Columns(Link):
             List_Column(self.columnsKey,self.allColumnsKey,col,enable).AppendToMenu(subMenu,window,data)
 
 #------------------------------------------------------------------------------
-class Installers_AddMarker(Link):
+class Installers_AddMarker(_Link):
     """Add an installer marker."""
-    def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Add Marker...'),_(u'Adds a Marker, a special type of package useful for separating and labelling your packages.'))
-        menu.AppendItem(menuItem)
+    text = _(u'Add Marker...')
+    help = _(u'Adds a Marker, a special type of package useful for separating and labelling your packages.')
 
     def Execute(self,event):
         """Handle selection."""
@@ -8317,13 +8317,10 @@ class Installers_AddMarker(Link):
             self.gTank.gList.EditLabel(index)
 
 #------------------------------------------------------------------------------
-class Installers_MonitorInstall(Link):
+class Installers_MonitorInstall(_Link):
     """Monitors Data folder for external installation."""
-    def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Monitor External Installation...'),
-                               _(u'Monitors the Data folder during installation via manual install or 3rd party tools.'))
-        menu.AppendItem(menuItem)
+    text = _(u'Monitor External Installation...')
+    help = _(u'Monitors the Data folder during installation via manual install or 3rd party tools.')
 
     def Execute(self,event):
         """Handle Selection."""
@@ -8444,12 +8441,11 @@ class Installers_MonitorInstall(Link):
 
 # Installers Links ------------------------------------------------------------
 #------------------------------------------------------------------------------
-class Installers_AnnealAll(Link):
+class Installers_AnnealAll(_Link):
     """Anneal all packages."""
-    def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Anneal All'),_(u'This will install any missing files (for active installers) and correct all install order and reconfiguration errors.'))
-        menu.AppendItem(menuItem)
+    text = _(u'Anneal All')
+    help = _(u'This will install any missing files (for active installers)'
+             u' and correct all install order and reconfiguration errors.')
 
     def Execute(self,event):
         """Handle selection."""
@@ -8462,12 +8458,10 @@ class Installers_AnnealAll(Link):
             bashFrame.RefreshData()
 
 #------------------------------------------------------------------------------
-class Installers_UninstallAllPackages(Link):
+class Installers_UninstallAllPackages(_Link):
     """Uninstall all packages."""
-    def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Uninstall All Packages'),_(u'This will uninstall all packages.'))
-        menu.AppendItem(menuItem)
+    text = _(u'Uninstall All Packages')
+    help = _(u'This will uninstall all packages.')
 
     def Execute(self,event):
         """Handle selection."""
@@ -8481,30 +8475,33 @@ class Installers_UninstallAllPackages(Link):
             bashFrame.RefreshData()
 
 #------------------------------------------------------------------------------
-class Installers_UninstallAllUnknownFiles(Link):
-    """Uninstall all files that do not come from a current package/bethesda files.
-       For safety just moved to Oblivion Mods\Bash Installers\Bash\Data Folder Contents (date/time)\."""
-    def __init__(self):
-        Link.__init__(self)
-        self._helpMessage = _(u'This will remove all mod files that are not linked to an active installer out of the Data folder.')
-
-    def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Clean Data'),self._helpMessage)
-        menu.AppendItem(menuItem)
+class Installers_UninstallAllUnknownFiles(_Link):
+    """Uninstall all files that do not come from a current package/bethesda
+    files. For safety just moved to Oblivion Mods\Bash Installers\Bash\Data
+    Folder Contents (date/time)\."""
+    text = _(u'Clean Data')
+    help = _(u'This will remove all mod files that are not linked to an'
+             u' active installer out of the Data folder.')
 
     def Execute(self,event):
         """Handle selection."""
-        fullMessage = _(u"Clean Data directory?") + u"  " + self._helpMessage + u"  " + _(u'This includes files that were installed manually or by another program.  Files will be moved to the "%s" directory instead of being deleted so you can retrieve them later if necessary.  Note that if you use TES4LODGen, this will also clean out the DistantLOD folder, so on completion please run TES4LodGen again.') % u'Oblivion Mods\\Bash Installers\\Bash\\Data Folder Contents <date>'
-        if not balt.askYes(self.gTank,fill(fullMessage,70),self.title):
-            return
-        try:
-            with balt.Progress(_(u"Cleaning Data Files..."),u'\n'+u' '*65) as progress:
-                self.data.clean(progress=progress)
-        finally:
-            self.data.refresh(what='NS')
-            gInstallers.RefreshUIMods()
-            bashFrame.RefreshData()
+        fullMessage = _(
+            u"Clean Data directory?") + u"  " + self.help + u"  " + _(
+            u'This includes files that were installed manually or by another '
+            u'program.  Files will be moved to the "%s" directory instead of '
+            u'being deleted so you can retrieve them later if necessary.  '
+            u'Note that if you use TES4LODGen, this will also clean out the '
+            u'DistantLOD folder, so on completion please run TES4LodGen '
+            u'again.') % u'Oblivion Mods\\Bash Installers\\Bash\\Data Folder Contents <date>'
+        if balt.askYes(self.gTank,fill(fullMessage,70),self.title):
+            try:
+                with balt.Progress(_(u"Cleaning Data Files..."),
+                                   u'\n' + u' ' * 65) as progress:
+                    self.data.clean(progress=progress)
+            finally:
+                self.data.refresh(what='NS')
+                gInstallers.RefreshUIMods()
+                bashFrame.RefreshData()
 
 #------------------------------------------------------------------------------
 class Installers_AutoAnneal(BoolLink):
@@ -8638,9 +8635,8 @@ class Installers_BsaRedirection(BoolLink):
 
     def AppendToMenu(self,menu,window,data):
         section,key = bush.game.ini.bsaRedirection
-        if not section or not key:
-            return
-        BoolLink.AppendToMenu(self,menu,window,data)
+        if section and key:
+            BoolLink.AppendToMenu(self,menu,window,data)
 
     def Execute(self,event):
         """Handle selection."""
@@ -8808,15 +8804,15 @@ class Installers_skipLandscapeLODNormals(Installers_Skip):
 #------------------------------------------------------------------------------
 class Installers_SkipOBSEPlugins(Installers_Skip):
     """Toggle allowOBSEPlugins setting and update."""
+    kind=wx.ITEM_CHECK
+
     def __init__(self):
         BoolLink.__init__(self,_(u'Skip %s Plugins') % bush.game.se_sd,
                           'bash.installers.allowOBSEPlugins')
 
     def AppendToMenu(self,menu,window,data):
         if not bush.game.se_sd: return
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,self.text,self.help,kind=wx.ITEM_CHECK)
-        menu.AppendItem(menuItem)
+        menuItem = BoolLink.AppendToMenu(self,menu,window,data)
         menuItem.Check(not settings[self.key])
         bosh.installersWindow = self.gTank
 
