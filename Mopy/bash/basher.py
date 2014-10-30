@@ -511,8 +511,13 @@ class List(wx.Panel):
             self.list.DeleteColumn(self.numCols)
         self.list.SetColumnWidth(self.numCols, wx.LIST_AUTOSIZE_USEHEADER)
 
-    def PopulateItem(self,itemDex,mode=0,selected=set()):
-        """Populate ListCtrl for specified item. [ABSTRACT]"""
+    def PopulateItem(self,itemDex,mode=0,selected=set(),dataDict=None):
+        """Populate ListCtrl for specified item. [ABSTRACT]
+
+        TODO: document params
+        dataDict is used for optimization purposes - should be a dictionary
+        item -> index
+        """
         raise AbstractError
 
     def GetItems(self):
@@ -520,7 +525,7 @@ class List(wx.Panel):
         self.items = self.data.keys()
         return self.items
 
-    def PopulateItems(self,col=None,reverse=-2,selected='SAME'):
+    def PopulateItems(self,col=None,reverse=-2,selected='SAME',dataDict=None):
         """Sort items and populate entire list."""
         self.mouseTexts.clear()
         #--Sort Dirty?
@@ -537,7 +542,7 @@ class List(wx.Panel):
         #--Populate items
         for itemDex in xrange(len(self.items)):
             mode = int(itemDex >= listItemCount)
-            self.PopulateItem(itemDex,mode,selected) # (ut) takes time
+            self.PopulateItem(itemDex,mode,selected, dataDict=dataDict) # (ut) takes time
         #--Delete items?
         while self.list.GetItemCount() > len(self.items):
             self.list.DeleteItem(self.list.GetItemCount()-1)
@@ -846,7 +851,7 @@ class MasterList(List):
         return self.items
 
     #--Populate Item
-    def PopulateItem(self,itemDex,mode=0,selected=set()):
+    def PopulateItem(self,itemDex,mode=0,selected=set(),dataDict=None):
         itemId = self.items[itemDex]
         masterInfo = self.data[itemId]
         masterName = masterInfo.name
@@ -1096,7 +1101,7 @@ class INIList(List):
                 self.PopulateItem(file,selected=selected)
         bashFrame.SetStatusCount()
 
-    def PopulateItem(self,itemDex,mode=0,selected=set()):
+    def PopulateItem(self,itemDex,mode=0,selected=set(),dataDict=None):
         #--String name of item?
         if not isinstance(itemDex,int):
             itemDex = self.items.index(itemDex)
@@ -1386,21 +1391,27 @@ class ModList(List):
         self.RefreshUI()
 
     def RefreshUI(self,files='ALL',detail='SAME',refreshSaves=True):
-        """Refreshes UI for specified file. Also calls saveList.RefreshUI()!"""
+        """Refreshes UI for specified file. Also calls saveList.RefreshUI()!
+
+        Must be called AFTER bosh.modInfos.plugins.LoadOrder is set so
+        loDict() is properly constructed !!!!
+        """
         #--Details
         if detail == 'SAME':
             selected = set(self.GetSelected())
         else:
             selected = {detail}
         #--Populate
+        # cache the LO as a dictionary
+        dataDict = self.data.plugins.loDict()
         if files == 'ALL':
-            self.PopulateItems(selected=selected)
+            self.PopulateItems(selected=selected, dataDict=dataDict)
         elif isinstance(files,bolt.Path):
-            self.PopulateItem(files,selected=selected)
+            self.PopulateItem(files,selected=selected, dataDict=dataDict)
         else: #--Iterable
             for file in files:
                 if file in bosh.modInfos:
-                    self.PopulateItem(file,selected=selected)
+                    self.PopulateItem(file,selected=selected, dataDict=dataDict)
         modDetails.SetFile(detail)
         bashFrame.SetStatusCount()
         #--Saves
@@ -1408,7 +1419,7 @@ class ModList(List):
             saveList.RefreshUI()
 
     #--Populate Item
-    def PopulateItem(self,itemDex,mode=0,selected=set()):
+    def PopulateItem(self,itemDex,mode=0,selected=set(),dataDict=None):
         #--String name of item?
         if not isinstance(itemDex,int):
             itemDex = self.items.index(itemDex) # (ut) calls __cmp__
@@ -1455,7 +1466,7 @@ class ModList(List):
         #--Default message
         mouseText = u''
         #--Image
-        status = fileInfo.getStatus() # (ut) calls Getordered
+        status = fileInfo.getStatus(dataDict=dataDict) # (ut) calls Getordered
         checkMark = (
             1 if fileName in bosh.modInfos.ordered
             else 2 if fileName in bosh.modInfos.merged
@@ -2431,7 +2442,7 @@ class SaveList(List):
         bashFrame.SetStatusCount()
 
     #--Populate Item
-    def PopulateItem(self,itemDex,mode=0,selected=set()):
+    def PopulateItem(self,itemDex,mode=0,selected=set(),dataDict=None):
         #--String name of item?
         if not isinstance(itemDex,int):
             itemDex = self.items.index(itemDex)
@@ -3840,7 +3851,7 @@ class ScreensList(List):
         bashFrame.SetStatusCount()
 
     #--Populate Item
-    def PopulateItem(self,itemDex,mode=0,selected=set()):
+    def PopulateItem(self,itemDex,mode=0,selected=set(),dataDict=None):
         #--String name of item?
         if not isinstance(itemDex,int):
             itemDex = self.items.index(itemDex)
@@ -4020,7 +4031,7 @@ class BSAList(List):
         bashFrame.SetStatusCount()
 
     #--Populate Item
-    def PopulateItem(self,itemDex,mode=0,selected=set()):
+    def PopulateItem(self,itemDex,mode=0,selected=set(),dataDict=None):
         #--String name of item?
         if not isinstance(itemDex,int):
             itemDex = self.items.index(itemDex)
@@ -4328,7 +4339,7 @@ class MessageList(List):
         bashFrame.SetStatusCount()
 
     #--Populate Item
-    def PopulateItem(self,itemDex,mode=0,selected=set()):
+    def PopulateItem(self,itemDex,mode=0,selected=set(),dataDict=None):
         #--String name of item?
         if not isinstance(itemDex,int):
             itemDex = self.items.index(itemDex)
