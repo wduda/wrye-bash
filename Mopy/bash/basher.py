@@ -9266,17 +9266,16 @@ class Installer_Rename(InstallerLink):
             index = self.gTank.GetIndex(self.selected[0])
             if index != -1:
                 self.gTank.gList.EditLabel(index)
-##### REST OF INSTALLER LINKS NEED APPEND TO MENU TWEAKED
 
 #------------------------------------------------------------------------------
 class Installer_HasExtraData(InstallerLink):
     """Toggle hasExtraData flag on installer."""
+    text = _(u'Has Extra Directories')
+    help = _(u"Allow installation of files in non-standard directories.")
+    kind=wx.ITEM_CHECK
 
     def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Has Extra Directories'),kind=wx.ITEM_CHECK,
-            help=_(u"Allow installation of files in non-standard directories."))
-        menu.AppendItem(menuItem)
+        menuItem = _Link.AppendToMenu(self,menu,window,data)
         if self.isSingleInstallable():
             installer = self.data[self.selected[0]]
             menuItem.Check(installer.hasExtraData)
@@ -9292,6 +9291,7 @@ class Installer_HasExtraData(InstallerLink):
         installer.refreshStatus(self.data)
         self.data.refresh(what='N')
         self.gTank.RefreshUI()
+##### REST OF INSTALLER LINKS NEED APPEND TO MENU TWEAKED
 
 #------------------------------------------------------------------------------
 class Installer_OverrideSkips(InstallerLink):
