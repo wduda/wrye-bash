@@ -9392,11 +9392,10 @@ class Installer_Install(InstallerLink):
 #------------------------------------------------------------------------------
 class Installer_ListPackages(InstallerLink):
     """Copies list of Bain files to clipboard."""
-    def AppendToMenu(self,menu,window,data):
-        InstallerLink.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'List Packages...'),
-            _(u'Displays a list of all packages.  Also copies that list to the clipboard.  Useful for posting your package order on forums.'))
-        menu.AppendItem(menuItem)
+    text = _(u'List Packages...')
+    help= _(u'Displays a list of all packages.  Also copies that list to the clipboard.  Useful for posting your package order on forums.')
+
+    def _enable(self): return True
 
     def Execute(self,event):
         #--Get masters list
@@ -10271,17 +10270,17 @@ class InstallerProject_ReleasePack(InstallerLink):
 #------------------------------------------------------------------------------
 class InstallerConverter_Apply(InstallerLink):
     """Apply a Bain Conversion File."""
+    title = _(u'Apply BCF...') # title !
+    help=_(u"Rename selected installer(s).")
+
+    def _enable(self): return True
+
     def __init__(self,converter,numAsterisks):
         InstallerLink.__init__(self)
         self.converter = converter
         #--Add asterisks to indicate the number of unselected archives that the BCF uses
         self.dispName = u''.join((self.converter.fullPath.sbody,u'*' * numAsterisks))
-
-    def AppendToMenu(self,menu,window,data):
-        InstallerLink.AppendToMenu(self,menu,window,data)
-        self.title = _(u'Apply BCF...')
-        menuItem = wx.MenuItem(menu,self.id,self.dispName)
-        menu.AppendItem(menuItem)
+        self.text = self.dispName
 
     def Execute(self,event):
         #--Generate default filename from BCF filename
@@ -10331,10 +10330,10 @@ class InstallerConverter_Apply(InstallerLink):
 
 #------------------------------------------------------------------------------
 class InstallerConverter_ApplyEmbedded(InstallerLink):
-    def AppendToMenu(self,menu,window,data):
-        InstallerLink.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Embedded BCF'))
-        menu.AppendItem(menuItem)
+    text = _(u'Embedded BCF')
+    help=_(u"")
+
+    def _enable(self): return True
 
     def Execute(self,event):
         name = self.selected[0]
@@ -10409,12 +10408,11 @@ class InstallerConverter_ConvertMenu(balt.MenuLink):
 #------------------------------------------------------------------------------
 class InstallerConverter_Create(InstallerLink):
     """Create BAIN conversion file."""
+    title = _(u'Create BCF...') # title !
+    text = _(u'Create...')
+    help=_(u"")
 
-    def AppendToMenu(self,menu,window,data):
-        InstallerLink.AppendToMenu(self,menu,window,data)
-        self.title = _(u'Create BCF...')
-        menuItem = wx.MenuItem(menu,self.id,_(u'Create...'))
-        menu.AppendItem(menuItem)
+    def _enable(self): return True
 
     def Execute(self,event):
         #--Generate allowable targets
