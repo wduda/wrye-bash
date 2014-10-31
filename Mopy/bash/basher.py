@@ -9162,12 +9162,11 @@ class Installer_Anneal(InstallerLink):
 #------------------------------------------------------------------------------
 class Installer_Duplicate(InstallerLink):
     """Duplicate selected Installer."""
+    text = _(u'Duplicate...')
+
     def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        self.title = _(u'Duplicate...')
-        menuItem = wx.MenuItem(menu,self.id,self.title,
-            help=_(u"Duplicate selected %(installername)s.") % ({'installername':self.selected[0]}))
-        menu.AppendItem(menuItem)
+        self.help = _(u"Duplicate selected %(installername)s.") % ({'installername':self.selected[0]})
+        menuItem = _Link.AppendToMenu(self,menu,window,data)
         menuItem.Enable(self.isSingle() and not self.isSingleMarker())
 
     def Execute(self,event):
@@ -9182,7 +9181,7 @@ class Installer_Duplicate(InstallerLink):
             newName = root + (_(u' Copy (%d)') % index) + ext
             index += 1
         result = balt.askText(self.gTank,_(u"Duplicate %s to:") % curName.s,
-            self.title,newName.s)
+            self.text,newName.s)
         result = (result or u'').strip()
         if not result: return
         #--Error checking
