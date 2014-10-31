@@ -32,7 +32,6 @@ import locale; locale.setlocale(locale.LC_ALL,u'')
 #locale.setlocale(locale.LC_ALL,'German')
 #locale.setlocale(locale.LC_ALL,'Japanese_Japan.932')
 import time
-import operator
 
 # Imports ---------------------------------------------------------------------
 #--Python
@@ -40,11 +39,8 @@ import cPickle
 import ConfigParser
 import copy
 import datetime
-import math
 import os
-import random
 import re
-import shutil
 import string
 import struct
 import sys
@@ -52,8 +48,6 @@ from types import *
 from operator import attrgetter,itemgetter
 import subprocess
 from subprocess import Popen, PIPE
-import codecs
-import ctypes
 
 #--Local
 import balt
@@ -68,7 +62,6 @@ from cint import *
 from brec import *
 from brec import _coerce # Since it wont get imported by the import * (it
 # begins with _)
-from chardet.universaldetector import UniversalDetector
 from patcher.record_groups import MobWorlds, MobDials, MobICells, \
     MobObjects, MobBase
 import loot
