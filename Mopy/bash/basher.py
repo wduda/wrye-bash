@@ -8933,6 +8933,7 @@ class Installer_EditWizard(InstallerLink):
     help=_(u"Edit the wizard.txt associated with this project.")
 
     def AppendToMenu(self, menu, window, data):
+        self._initData(window, data)
         self.text = _(u'View Wizard...') if self.isSingleArchive() else _(
             u'Edit Wizard...')
         menuItem = _Link.AppendToMenu(self, menu, window, data)
@@ -9165,6 +9166,7 @@ class Installer_Duplicate(InstallerLink):
     text = _(u'Duplicate...')
 
     def AppendToMenu(self,menu,window,data):
+        self._initData(window, data)
         self.help = _(u"Duplicate selected %(installername)s.") % ({'installername':self.selected[0]})
         menuItem = _Link.AppendToMenu(self,menu,window,data)
         menuItem.Enable(self.isSingle() and not self.isSingleMarker())
@@ -9264,7 +9266,7 @@ class Installer_Rename(InstallerLink):
             index = self.gTank.GetIndex(self.selected[0])
             if index != -1:
                 self.gTank.gList.EditLabel(index)
-##### REST OF INSTALLER LINKS NEED APPEND TO MENU TWEAKED - FIX Installer_Duplicate
+##### REST OF INSTALLER LINKS NEED APPEND TO MENU TWEAKED
 
 #------------------------------------------------------------------------------
 class Installer_HasExtraData(InstallerLink):
