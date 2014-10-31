@@ -9647,7 +9647,7 @@ class Installer_CopyConflicts(InstallerLink):
 
     def Execute(self,event):
         """Handle selection."""
-        data = self.data # bosh.InstallersData instance
+        data = self.data # bosh.InstallersData instance (dict bolt.Path -> InstallerArchive)
         installers_dir = data.dir
         srcConflicts = set()
         packConflicts = []
@@ -9655,9 +9655,9 @@ class Installer_CopyConflicts(InstallerLink):
                            u'\n' + u' ' * 60) as progress:
             srcArchive = self.selected[0]
             srcInstaller = data[srcArchive]
-            src_sizeCrc = srcInstaller.data_sizeCrc
-            mismatched = set(src_sizeCrc)
-            if mismatched:
+            src_sizeCrc = srcInstaller.data_sizeCrc # dictionary Path
+            mismatched = set(src_sizeCrc) # set([bolt.Path(u'Docs\\THIS ESP IS A REPLACEMENT!!!.txt'), bolt.Path(u'Living Economy - SI.esp'), bolt.Path(u'Living Economy - Items.esp'), bolt.Path(u'Docs\\Living Economy README.htm')])
+            if mismatched: # just a set of bolt.Path of the src installer  files
                 numFiles = 0
                 curFile = 1
                 srcOrder = srcInstaller.order
@@ -9678,7 +9678,7 @@ class Installer_CopyConflicts(InstallerLink):
                     src for src,size,crc in srcInstaller.fileSizeCrcs if
                     (size,crc) in srcConflicts)
                 numFiles += len(srcConflicts)
-                if numFiles:
+                if numFiles: # there are conflicting files
                     progress.setFull(numFiles)
                     if isinstance(srcInstaller,bosh.InstallerProject):
                         for src in srcConflicts:
@@ -9723,13 +9723,13 @@ class Installer_CopyConflicts(InstallerLink):
                     project = destDir.root
                     if project not in data:
                         data[project] = bosh.InstallerProject(project)
-                    iProject = data[project]
-                    pProject = installers_dir.join(project)
+                    iProject = data[project] # <bash.bosh.InstallerProject object at 0x105A41B0>
+                    pProject = installers_dir.join(project) # bolt.Path F:\Oblivion Mods2\Bash Installers\030 - Conflicts
                     iProject.refreshed = False
                     iProject.refreshBasic(pProject,None,True)
                     if iProject.order == -1:
                         data.moveArchives([project],srcInstaller.order + 1)
-                    data.refresh(what='I')
+                    data.refresh(what='I') # InstallersData.refresh()
                     self.gTank.RefreshUI()
 
 # InstallerDetails Espm Links -------------------------------------------------
