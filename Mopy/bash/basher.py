@@ -8869,8 +8869,9 @@ class Installers_SortStructure(BoolLink):
 
 # Installer Links -------------------------------------------------------------
 #------------------------------------------------------------------------------
-class InstallerLink(Link):
+class InstallerLink(_Link):
     """Common functions for installer links..."""
+    # TODO: _shouldEnable attribute to use in common AppendToMenu
 
     def isSingleInstallable(self):
         if len(self.selected) == 1:
@@ -8897,7 +8898,7 @@ class InstallerLink(Link):
         return len(self.selected) == 1
 
     def isSingleMarker(self):
-        """Indicates wheter or not is single installer marker."""
+        """Indicates whether or not is single installer marker."""
         if len(self.selected) != 1: return False
         else: return isinstance(self.data[self.selected[0]],bosh.InstallerMarker)
 
@@ -8929,19 +8930,14 @@ class InstallerLink(Link):
 #------------------------------------------------------------------------------
 class Installer_EditWizard(InstallerLink):
     """Edit the wizard.txt associated with this project"""
+    help=_(u"Edit the wizard.txt associated with this project.")
+
     def AppendToMenu(self, menu, window, data):
-        Link.AppendToMenu(self, menu, window, data)
-        if self.isSingleArchive():
-            title = _(u'View Wizard...')
-        else:
-            title = _(u'Edit Wizard...')
-        menuItem = wx.MenuItem(menu, self.id, title,
-            help=_(u"Edit the wizard.txt associated with this project."))
-        menu.AppendItem(menuItem)
-        if self.isSingleInstallable():
-            menuItem.Enable(bool(self.data[self.selected[0]].hasWizard))
-        else:
-            menuItem.Enable(False)
+        self.text = _(u'View Wizard...') if self.isSingleArchive() else _(
+            u'Edit Wizard...')
+        menuItem = _Link.AppendToMenu(self, menu, window, data)
+        menuItem.Enable(self.isSingleInstallable() and bool(
+            self.data[self.selected[0]].hasWizard))
 
     def Execute(self, event):
         path = self.selected[0]
@@ -8968,20 +8964,15 @@ class Installer_EditWizard(InstallerLink):
 class Installer_Wizard(InstallerLink):
     """Runs the install wizard to select subpackages and esp/m filtering"""
     parentWindow = ''
+    help=_(u"Run the install wizard.")
 
     def __init__(self, bAuto):
         InstallerLink.__init__(self)
         self.bAuto = bAuto
+        self.text = _(u'Auto Wizard') if self.bAuto else _(u'Wizard')
 
     def AppendToMenu(self, menu, window, data):
-        Link.AppendToMenu(self, menu, window, data)
-        if not self.bAuto:
-            menuItem = wx.MenuItem(menu, self.id, _(u'Wizard'),
-                help=_(u"Run the install wizard."))
-        else:
-            menuItem = wx.MenuItem(menu, self.id, _(u'Auto Wizard'),
-                help=_(u"Run the install wizard."))
-        menu.AppendItem(menuItem)
+        menuItem = _Link.AppendToMenu(self, menu, window, data)
         if self.isSingle():
             installer = self.data[self.selected[0]]
             menuItem.Enable(installer.hasWizard != False)
@@ -9120,12 +9111,11 @@ class Installer_Wizard(InstallerLink):
 
 class Installer_OpenReadme(InstallerLink):
     """Opens the installer's readme if BAIN can find one"""
+    text = _(u'Open Readme')
+    help = _(u"Opens the installer's readme.")
 
     def AppendToMenu(self, menu, window, data):
-        Link.AppendToMenu(self, menu, window, data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Open Readme'),
-            help=_(u"Opens the installer's readme."))
-        menu.AppendItem(menuItem)
+        menuItem = _Link.AppendToMenu(self, menu, window, data)
         if self.isSingle():
             installer = self.data[self.selected[0]]
             menuItem.Enable(bool(installer.hasReadme))
@@ -9149,11 +9139,11 @@ class Installer_OpenReadme(InstallerLink):
 #------------------------------------------------------------------------------
 class Installer_Anneal(InstallerLink):
     """Anneal all packages."""
+    text = _(u'Anneal')
+    help = _(u"Anneal all packages.")
+
     def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Anneal'),
-            help=_(u"Anneal all packages."))
-        menu.AppendItem(menuItem)
+        menuItem = _Link.AppendToMenu(self,menu,window,data)
         selected = self.filterInstallables()
         menuItem.Enable(len(selected))
 
@@ -9216,12 +9206,11 @@ class Installer_Duplicate(InstallerLink):
 #------------------------------------------------------------------------------
 class Installer_Hide(InstallerLink):
     """Hide selected Installers."""
+    text = _(u'Hide...')
+    help = _(u"Hide selected installer(s).")
+
     def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        self.title = _(u'Hide...')
-        menuItem = wx.MenuItem(menu,self.id,self.title,
-            help=_(u"Hide selected installer(s)."))
-        menu.AppendItem(menuItem)
+        menuItem = _Link.AppendToMenu(self,menu,window,data)
         for item in window.GetSelected():
             if isinstance(window.data[item],bosh.InstallerMarker):
                 menuItem.Enable(False)
@@ -9250,12 +9239,11 @@ class Installer_Hide(InstallerLink):
 #------------------------------------------------------------------------------
 class Installer_Rename(InstallerLink):
     """Renames files by pattern."""
+    text = _(u'Rename...')
+    help=_(u"Rename selected installer(s).")
+
     def AppendToMenu(self,menu,window,data):
-        Link.AppendToMenu(self,menu,window,data)
-        menuItem = wx.MenuItem(menu,self.id,_(u'Rename...'),
-            help=_(u"Rename selected installer(s)."))
-        menu.AppendItem(menuItem)
-        self.InstallerType = None
+        menuItem = _Link.AppendToMenu(self,menu,window,data)
         ##Only enable if all selected items are of the same type
         firstItem = window.data[window.GetSelected()[0]]
         if isinstance(firstItem,bosh.InstallerMarker):
@@ -9264,13 +9252,12 @@ class Installer_Rename(InstallerLink):
             self.InstallerType = bosh.InstallerArchive
         elif isinstance(firstItem,bosh.InstallerProject):
             self.InstallerType = bosh.InstallerProject
-
+        else: self.InstallerType = None
         if self.InstallerType:
             for item in window.GetSelected():
                 if not isinstance(window.data[item],self.InstallerType):
                     menuItem.Enable(False)
                     return
-
         menuItem.Enable(True)
 
     def Execute(self,event):
@@ -9278,6 +9265,7 @@ class Installer_Rename(InstallerLink):
             index = self.gTank.GetIndex(self.selected[0])
             if index != -1:
                 self.gTank.gList.EditLabel(index)
+##### REST OF INSTALLER LINKS NEED APPEND TO MENU TWEAKED - FIX Installer_Duplicate
 
 #------------------------------------------------------------------------------
 class Installer_HasExtraData(InstallerLink):
