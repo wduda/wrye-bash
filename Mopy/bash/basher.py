@@ -11702,7 +11702,7 @@ class Mod_ActorLevels_Export(Link):
                 fileInfo = bosh.modInfos[fileName]
                 readProgress(index,_(u'Reading')+u' '+fileName.s)
                 actorLevels.readFromMod(fileInfo)
-            progress(0.8,_(u'Exporting to')+u' '+textName.s+u'.')
+            progress(0.8, _(u'Exporting to') + u' ' + textName.s + u'.')
             actorLevels.writeToText(textPath)
             progress(1.0,_(u'Done.'))
 
@@ -12713,9 +12713,9 @@ class Mod_FactionRelations_Export(Link):
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
                 fileInfo = bosh.modInfos[fileName]
-                readProgress(index,_(u'Reading')+u' '+fileName.s+u'.')
+                readProgress(index, _(u'Reading') + u' ' + fileName.s + u'.')
                 factionRelations.readFromMod(fileInfo)
-            progress(0.8,_(u'Exporting to')+u' '+textName.s+u'.')
+            progress(0.8, _(u'Exporting to') + u' ' + textName.s + u'.')
             factionRelations.writeToText(textPath)
             progress(1.0,_(u'Done.'))
 
@@ -12805,7 +12805,7 @@ class Mod_Factions_Export(Link):
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
                 fileInfo = bosh.modInfos[fileName]
-                readProgress(index,_(u'Reading')+u' '+fileName.s+u'.')
+                readProgress(index, _(u'Reading') + u' ' + fileName.s + u'.')
                 actorFactions.readFromMod(fileInfo)
             progress(0.8,_(u'Exporting to ')+u' '+textName.s+u'.')
             actorFactions.writeToText(textPath)
@@ -13328,7 +13328,7 @@ class Mod_EditorIds_Export(Link):
                 editorIds.readFromMod(fileInfo)
             progress(0.8,_(u"Exporting to %s.") % (textName.s,))
             editorIds.writeToText(textPath)
-            progress(1.0,_(u"Done."))
+            progress(1.0,_(u'Done.'))
 
 #------------------------------------------------------------------------------
 class Mod_EditorIds_Import(Link):
@@ -13371,7 +13371,7 @@ class Mod_EditorIds_Import(Link):
                 editorIds.readFromText(textPath,questionableEidsSet,badEidsList)
                 progress(0.2,_(u"Applying to %s.") % (fileName.s,))
                 changed = editorIds.writeToMod(fileInfo)
-                progress(1.0,_(u"Done."))
+                progress(1.0,_(u'Done.'))
             #--Log
             if not changed:
                 balt.showOk(self.window,_(u"No changes required."))
@@ -13499,7 +13499,7 @@ class Mod_Fids_Replace(Link):
             replacer.readFromText(textPath)
             progress(0.2,_(u"Applying to %s.") % fileName.s)
             changed = replacer.updateMod(fileInfo)
-            progress(1.0,_(u"Done."))
+            progress(1.0,_(u'Done.'))
         #--Log
         if not changed:
             balt.showOk(self.window,_(u"No changes required."))
@@ -13538,11 +13538,11 @@ class Mod_FullNames_Export(Link):
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
                 fileInfo = bosh.modInfos[fileName]
-                readProgress(index,_(u"Reading %s.") % fileName.s)
+                readProgress(index, _(u'Reading') + u' ' + fileName.s + u'.')
                 fullNames.readFromMod(fileInfo)
-            progress(0.8,_(u"Exporting to %s.") % textName.s)
+            progress(0.8, _(u'Exporting to') + u' ' + textName.s + u'.')
             fullNames.writeToText(textPath)
-            progress(1.0,_(u"Done."))
+            progress(1.0,_(u'Done.'))
 
 #------------------------------------------------------------------------------
 class Mod_FullNames_Import(Link):
@@ -13587,7 +13587,7 @@ class Mod_FullNames_Import(Link):
                 fullNames.readFromMod(srcInfo)
             progress(0.2,_(u"Applying to %s.") % fileName.s)
             renamed = fullNames.writeToMod(fileInfo)
-            progress(1.0,_(u"Done."))
+            progress(1.0,_(u'Done.'))
         #--Log
         if not renamed:
             balt.showOk(self.window,_(u"No changes required."))
@@ -14013,7 +14013,7 @@ class Mod_RemoveWorldOrphans(Link):
                 if orphans:
                     progress(0.1,_(u"Saving %s.") % fileName.s)
                     modFile.safeSave()
-                progress(1.0,_(u"Done."))
+                progress(1.0,_(u'Done.'))
             #--Log
             if orphans:
                 balt.showOk(self.window,_(u"Orphan cell blocks removed: %d.") % orphans,fileName.s)
@@ -14200,11 +14200,11 @@ class Mod_Stats_Export(Link):
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
                 fileInfo = bosh.modInfos[fileName]
-                readProgress(index,_(u"Reading %s.") % fileName.s)
+                readProgress(index, _(u'Reading') + u' ' + fileName.s + u'.')
                 itemStats.readFromMod(fileInfo)
-            progress(0.8,_(u"Exporting to %s.") % textName.s)
+            progress(0.8, _(u'Exporting to') + u' ' + textName.s + u'.')
             itemStats.writeToText(textPath)
-            progress(1.0,_(u"Done."))
+            progress(1.0,_(u'Done.'))
 
 #------------------------------------------------------------------------------
 class Mod_Stats_Import(Link):
@@ -14245,7 +14245,7 @@ class Mod_Stats_Import(Link):
             itemStats.readFromText(textPath)
             progress(0.2,_(u"Applying to %s.") % fileName.s)
             changed = itemStats.writeToMod(fileInfo)
-            progress(1.0,_(u"Done."))
+            progress(1.0,_(u'Done.'))
         #--Log
         if not changed:
             balt.showOk(self.window,_(u"No relevant stats to import."),_(u"Import Stats"))
@@ -14291,11 +14291,11 @@ class Mod_ItemData_Export(Link):
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
                 fileInfo = bosh.modInfos[fileName]
-                readProgress(index,_(u"Reading %s.") % fileName.s)
+                readProgress(index, _(u'Reading') + u' ' + fileName.s + u'.')
                 itemStats.readFromMod(fileInfo)
-            progress(0.8,_(u"Exporting to %s.") % textName.s)
+            progress(0.8, _(u'Exporting to') + u' ' + textName.s + u'.')
             itemStats.writeToText(textPath)
-            progress(1.0,_(u"Done."))
+            progress(1.0,_(u'Done.'))
 
 #------------------------------------------------------------------------------
 class Mod_ItemData_Import(Link):
@@ -14382,7 +14382,7 @@ class Mod_Prices_Export(Link):
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
                 fileInfo = bosh.modInfos[fileName]
-                readProgress(index,_(u'Reading')+u' '+fileName.s+u'.')
+                readProgress(index, _(u'Reading') + u' ' + fileName.s + u'.')
                 itemPrices.readFromMod(fileInfo)
             progress(0.8,_(u'Exporting to')+u' '+textName.s+'.')
             itemPrices.writeToText(textPath)
@@ -14474,9 +14474,9 @@ class CBash_Mod_MapMarkers_Export(Link):
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
                 fileInfo = bosh.modInfos[fileName]
-                readProgress(index,_(u'Reading')+u' '+fileName.s+u'.')
+                readProgress(index, _(u'Reading') + u' ' + fileName.s + u'.')
                 mapMarkers.readFromMod(fileInfo)
-            progress(0.8,_(u'Exporting to')+u' '+textName.s+u'.')
+            progress(0.8, _(u'Exporting to') + u' ' + textName.s + u'.')
             mapMarkers.writeToText(textPath)
             progress(1.0,_(u'Done.'))
 
@@ -14561,11 +14561,11 @@ class CBash_Mod_CellBlockInfo(Link):
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
                 fileInfo = bosh.modInfos[fileName]
-                readProgress(index,_(u"Reading %s.") % fileName.s)
+                readProgress(index, _(u'Reading') + u' ' + fileName.s + u'.')
                 cellblocks.readFromMod(fileInfo)
-            progress(0.8,_(u"Exporting to %s.") % textName.s)
+            progress(0.8, _(u'Exporting to') + u' ' + textName.s + u'.')
             cellblocks.writeToText(textPath)
-            progress(1.0,_(u"Done."))
+            progress(1.0,_(u'Done.'))
 
 #------------------------------------------------------------------------------
 from patcher.utilities import SigilStoneDetails, CBash_SigilStoneDetails
@@ -14600,9 +14600,9 @@ class Mod_SigilStoneDetails_Export(Link):
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
                 fileInfo = bosh.modInfos[fileName]
-                readProgress(index,_(u'Reading')+u' '+fileName.s+u'.')
+                readProgress(index, _(u'Reading') + u' ' + fileName.s + u'.')
                 sigilStones.readFromMod(fileInfo)
-            progress(0.8,_(u'Exporting to')+u' '+textName.s+u'.')
+            progress(0.8, _(u'Exporting to') + u' ' + textName.s + u'.')
             sigilStones.writeToText(textPath)
             progress(1.0,_(u'Done.'))
 
@@ -14699,9 +14699,9 @@ class Mod_SpellRecords_Export(Link):
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
                 fileInfo = bosh.modInfos[fileName]
-                readProgress(index,_(u'Reading')+u' '+fileName.s+u'.')
+                readProgress(index, _(u'Reading') + u' ' + fileName.s + u'.')
                 spellRecords.readFromMod(fileInfo)
-            progress(0.8,_(u'Exporting to')+u' '+textName.s+u'.')
+            progress(0.8, _(u'Exporting to') + u' ' + textName.s + u'.')
             spellRecords.writeToText(textPath)
             progress(1.0,_(u'Done.'))
 
@@ -14799,9 +14799,9 @@ class Mod_IngredientDetails_Export(Link):
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
                 fileInfo = bosh.modInfos[fileName]
-                readProgress(index,_(u'Reading')+u' '+fileName.s+u'.')
+                readProgress(index, _(u'Reading') + u' ' + fileName.s + u'.')
                 Ingredients.readFromMod(fileInfo)
-            progress(0.8,_(u'Exporting to')+u' '+textName.s+u'.')
+            progress(0.8, _(u'Exporting to') + u' ' + textName.s + u'.')
             Ingredients.writeToText(textPath)
             progress(1.0,_(u'Done.'))
 
