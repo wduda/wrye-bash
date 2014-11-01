@@ -12692,6 +12692,9 @@ class Mod_FactionRelations_Export(Link):
         menu.AppendItem(menuItem)
         menuItem.Enable(bool(self.data))
 
+    def _parser(self):
+        return CBash_FactionRelations() if CBash else FactionRelations()
+
     def Execute(self,event):
         fileName = GPath(self.data[0])
         fileInfo = bosh.modInfos[fileName]
@@ -12705,10 +12708,7 @@ class Mod_FactionRelations_Export(Link):
         (textDir,textName) = textPath.headTail
         #--Export
         with balt.Progress(_(u'Export Relations')) as progress:
-            if CBash:
-                factionRelations = CBash_FactionRelations()
-            else:
-                factionRelations = FactionRelations()
+            factionRelations = self._parser()
             readProgress = SubProgress(progress,0.1,0.8)
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
@@ -12784,6 +12784,9 @@ class Mod_Factions_Export(Link):
         menu.AppendItem(menuItem)
         menuItem.Enable(bool(self.data))
 
+    def _parser(self):
+        return CBash_ActorFactions() if CBash else ActorFactions()
+
     def Execute(self,event):
         fileName = GPath(self.data[0])
         fileInfo = bosh.modInfos[fileName]
@@ -12797,10 +12800,7 @@ class Mod_Factions_Export(Link):
         (textDir,textName) = textPath.headTail
         #--Export
         with balt.Progress(_(u'Export Factions')) as progress:
-            if CBash:
-                actorFactions = CBash_ActorFactions()
-            else:
-                actorFactions = ActorFactions()
+            actorFactions = self._parser()
             readProgress = SubProgress(progress,0.1,0.8)
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
@@ -13517,6 +13517,9 @@ class Mod_FullNames_Export(Link):
         menu.AppendItem(menuItem)
         menuItem.Enable(bool(self.data))
 
+    def _parser(self):
+        return CBash_FullNames() if CBash else FullNames()
+
     def Execute(self,event):
         fileName = GPath(self.data[0])
         fileInfo = bosh.modInfos[fileName]
@@ -13530,10 +13533,7 @@ class Mod_FullNames_Export(Link):
         (textDir,textName) = textPath.headTail
         #--Export
         with balt.Progress(_(u"Export Names")) as progress:
-            if CBash:
-                fullNames = CBash_FullNames()
-            else:
-                fullNames = FullNames()
+            fullNames = self._parser()
             readProgress = SubProgress(progress,0.1,0.8)
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
@@ -14179,6 +14179,9 @@ class Mod_Stats_Export(Link):
         menu.AppendItem(menuItem)
         menuItem.Enable(bool(self.data))
 
+    def _parser(self):
+        return CBash_ItemStats() if CBash else ItemStats()
+
     def Execute(self,event):
         fileName = GPath(self.data[0])
         fileInfo = bosh.modInfos[fileName]
@@ -14192,10 +14195,7 @@ class Mod_Stats_Export(Link):
         (textDir,textName) = textPath.headTail
         #--Export
         with balt.Progress(_(u"Export Stats")) as progress:
-            if CBash:
-                itemStats = CBash_ItemStats()
-            else:
-                itemStats = ItemStats()
+            itemStats = self._parser()
             readProgress = SubProgress(progress,0.1,0.8)
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
@@ -14270,6 +14270,9 @@ class Mod_ItemData_Export(Link):
         menu.AppendItem(menuItem)
         menuItem.Enable(bool(self.data))
 
+    def _parser(self):
+        return CBash_CompleteItemData() if CBash else CompleteItemData()
+
     def Execute(self,event):
         fileName = GPath(self.data[0])
         fileInfo = bosh.modInfos[fileName]
@@ -14283,10 +14286,7 @@ class Mod_ItemData_Export(Link):
         (textDir,textName) = textPath.headTail
         #--Export
         with balt.Progress(_(u"Export Item Data")) as progress:
-            if CBash:
-                itemStats = CBash_CompleteItemData()
-            else:
-                itemStats = CompleteItemData()
+            itemStats = self._parser()
             readProgress = SubProgress(progress,0.1,0.8)
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
@@ -14456,6 +14456,8 @@ class CBash_Mod_MapMarkers_Export(Link):
         menu.AppendItem(menuItem)
         menuItem.Enable(bool(self.data) and bool(CBash))
 
+    def _parser(self): return CBash_MapMarkers()
+
     def Execute(self,event):
         fileName = GPath(self.data[0])
         fileInfo = bosh.modInfos[fileName]
@@ -14469,7 +14471,7 @@ class CBash_Mod_MapMarkers_Export(Link):
         (textDir,textName) = textPath.headTail
         #--Export
         with balt.Progress(_(u'Export Map Markers')) as progress:
-            mapMarkers = CBash_MapMarkers()
+            mapMarkers = self._parser()
             readProgress = SubProgress(progress,0.1,0.8)
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
@@ -14543,6 +14545,8 @@ class CBash_Mod_CellBlockInfo(Link):
         menu.AppendItem(menuItem)
         menuItem.Enable(bool(self.data) and bool(CBash))
 
+    def _parser(self): return CBash_CellBlockInfo()
+
     def Execute(self,event):
         fileName = GPath(self.data[0])
         fileInfo = bosh.modInfos[fileName]
@@ -14556,7 +14560,7 @@ class CBash_Mod_CellBlockInfo(Link):
         (textDir,textName) = textPath.headTail
         #--Export
         with balt.Progress(_(u"Export Cell Block Info")) as progress:
-            cellblocks = CBash_CellBlockInfo()
+            cellblocks = self._parser()
             readProgress = SubProgress(progress,0.1,0.8)
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
@@ -14578,6 +14582,9 @@ class Mod_SigilStoneDetails_Export(Link):
         menu.AppendItem(menuItem)
         menuItem.Enable(bool(self.data))
 
+    def _parser(self):
+        return CBash_SigilStoneDetails() if CBash else SigilStoneDetails()
+
     def Execute(self,event):
         fileName = GPath(self.data[0])
         fileInfo = bosh.modInfos[fileName]
@@ -14592,10 +14599,7 @@ class Mod_SigilStoneDetails_Export(Link):
         (textDir,textName) = textPath.headTail
         #--Export
         with balt.Progress(_(u'Export Sigil Stone details')) as progress:
-            if CBash:
-                sigilStones = CBash_SigilStoneDetails()
-            else:
-                sigilStones = SigilStoneDetails()
+            sigilStones = self._parser()
             readProgress = SubProgress(progress,0.1,0.8)
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
@@ -14778,6 +14782,9 @@ class Mod_IngredientDetails_Export(Link):
         menu.AppendItem(menuItem)
         menuItem.Enable(bool(self.data))
 
+    def _parser(self):
+        return CBash_IngredientDetails() if CBash else IngredientDetails()
+
     def Execute(self,event):
         fileName = GPath(self.data[0])
         fileInfo = bosh.modInfos[fileName]
@@ -14791,10 +14798,7 @@ class Mod_IngredientDetails_Export(Link):
         (textDir,textName) = textPath.headTail
         #--Export
         with balt.Progress(_(u'Export Ingredient details')) as progress:
-            if CBash:
-                Ingredients = CBash_IngredientDetails()
-            else:
-                Ingredients = IngredientDetails()
+            Ingredients = self._parser()
             readProgress = SubProgress(progress,0.1,0.8)
             readProgress.setFull(len(self.data))
             for index,fileName in enumerate(map(GPath,self.data)):
