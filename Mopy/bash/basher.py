@@ -12686,6 +12686,9 @@ from patcher.utilities import FactionRelations, CBash_FactionRelations
 
 class Mod_FactionRelations_Export(Link):
     """Export faction relations from mod to text file."""
+    askTitle = _(u'Export faction relations to:')
+    csvFile = u'_Relations.csv'
+
     def AppendToMenu(self,menu,window,data):
         Link.AppendToMenu(self,menu,window,data)
         menuItem = wx.MenuItem(menu,self.id,_(u'Relations...'))
@@ -12698,12 +12701,12 @@ class Mod_FactionRelations_Export(Link):
     def Execute(self,event):
         fileName = GPath(self.data[0])
         fileInfo = bosh.modInfos[fileName]
-        textName = fileName.root+u'_Relations.csv'
+        textName = fileName.root+self.__class__.csvFile
         textDir = bosh.dirs['patches']
         textDir.makedirs()
         #--File dialog
-        textPath = balt.askSave(self.window,_(u'Export faction relations to:'),
-                                textDir,textName, u'*_Relations.csv')
+        textPath = balt.askSave(self.window,self.__class__.askTitle,textDir,
+                                textName, u'*' + self.__class__.csvFile)
         if not textPath: return
         (textDir,textName) = textPath.headTail
         #--Export
@@ -12778,6 +12781,9 @@ from patcher.utilities import ActorFactions, CBash_ActorFactions
 
 class Mod_Factions_Export(Link):
     """Export factions from mod to text file."""
+    askTitle = _(u'Export factions to:')
+    csvFile = u'_Factions.csv'
+
     def AppendToMenu(self,menu,window,data):
         Link.AppendToMenu(self,menu,window,data)
         menuItem = wx.MenuItem(menu,self.id,_(u'Factions...'))
@@ -12790,12 +12796,12 @@ class Mod_Factions_Export(Link):
     def Execute(self,event):
         fileName = GPath(self.data[0])
         fileInfo = bosh.modInfos[fileName]
-        textName = fileName.root+u'_Factions.csv'
+        textName = fileName.root+self.__class__.csvFile
         textDir = bosh.dirs['patches']
         textDir.makedirs()
         #--File dialog
-        textPath = balt.askSave(self.window,_(u'Export factions to:'),textDir,
-                                textName, u'*_Factions.csv')
+        textPath = balt.askSave(self.window,self.__class__.askTitle,textDir,
+                                textName, u'*' + self.__class__.csvFile)
         if not textPath: return
         (textDir,textName) = textPath.headTail
         #--Export
